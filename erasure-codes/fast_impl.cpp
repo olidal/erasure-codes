@@ -285,8 +285,8 @@ namespace fast_impl
 				for (size_t i = 0; i < node_bytes; ++i)
 				{
 					uint8_t in_val = in[i];
-					uint8_t hi = hit[in_val];
-					uint8_t lo = lot[in_val];
+					uint8_t hi = hit[in_val >> 4];
+					uint8_t lo = lot[in_val & 0xF];
 
 					out[i] ^= hi ^ lo;
 				}

@@ -142,6 +142,15 @@ namespace erasure
 
 			return m;
 		}
+
+		symbol_t* row(size_t r)
+		{
+			return &data[n_cols * r];
+		}
+		const symbol_t* row(size_t r) const
+		{
+			return &data[n_cols * r];
+		}
 	};
 
 	inline matrix inverse(matrix orig)
