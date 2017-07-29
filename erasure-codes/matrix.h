@@ -142,6 +142,22 @@ namespace erasure
 
 			return m;
 		}
+		matrix submatrix(
+			size_t rmin, size_t cmin, 
+			size_t rmax, size_t cmax) const
+		{
+			matrix m = matrix(rmax - rmin, cmax - cmin);
+
+			for (size_t r = 0; r < rmax - rmin; ++r)
+			{
+				for (size_t c = 0; c < cmax - cmin; ++c)
+				{
+					m(r, c) = (*this)(rmin + r, cmin + c);
+				}
+			}
+
+			return m;
+		}
 
 		symbol_t* row(size_t r)
 		{

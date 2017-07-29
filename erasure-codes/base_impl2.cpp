@@ -1,17 +1,20 @@
 
+#include "galois.h"
+#include "matrix.h"
+
 #include <cstdint>
-#include <zmmintrin.h>
+#include <numeric>
 
-static constexpr size_t n = 20;
-static constexpr size_t k = 16;
-static constexpr size_t node_bytes = 4096;
+using namespace erasure;
 
-// Currently not supported in visual studio
-#if 0
-namespace avx2_impl
+namespace base_impl2
 {
+	static constexpr size_t n = 20;
+	static constexpr size_t k = 16;
+	static constexpr size_t num_bytes = 1024 * 1024;
+
 	// Contains lo then hi
-	__declspec(align(64)) constexpr uint8_t lohi_table[][2][16] = {
+	constexpr uint8_t lohi_table[][2][16] = {
 		{ { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 } },
 		{ { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },{ 0,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240 } },
 		{ { 0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30 },{ 0,32,64,96,128,160,192,224,29,61,93,125,157,189,221,253 } },
@@ -270,56 +273,116 @@ namespace avx2_impl
 		{ { 0,255,227,28,219,36,56,237,171,42,72,213,112,201,199,108 },{ 0,75,150,221,49,122,167,118,98,154,244,209,83,12,236,142 } }
 	};
 
-	void aligned_zero(uint8_t* dst, size_t size)
+	static matrix vandermonde(size_t rows, size_t cols)
 	{
-		__m512i zero = _mm512_set1_epi8(0);
-
-		for (size_t i = 0; i < size; i += sizeof(__m512i))
+		matrix result = matrix(rows, cols);
+		for (uint8_t r = 0; r < rows; ++r)
 		{
-			_mm512_store_si512((__m512i*)(dst + i), zero);
+			for (uint8_t c = 0; c < cols; ++c)
+			{
+				result(r, c) = symbol_t::exp(r, c);
+			}
 		}
+		return result;
+	}
+	static matrix build_matrix(size_t n, size_t k)
+	{
+		matrix vm = vandermonde(n, k);
+
+		return vm * inverse(vm.submatrix(k, k));
 	}
 
-	// data and parity must be 32 byte aligned
-	void encode(const uint8_t* data, uint8_t* parity)
+	void codesome(
+		const matrix& mat_rows,
+		uint8_t** inputs,
+		uint8_t** outputs,
+		uint8_t n_outputs,
+		size_t num_bytes)
 	{
-		aligned_zero(parity, node_bytes * (n - k));
-
-		__m512i lomask = _mm512_set1_epi8(0x0F);
-		__m512i himask = _mm512_set1_epi8((char)0xF0);
-
-		for (size_t c = 0; c < k; ++c)
+		for (uint8_t c = 0; c < n; ++c)
 		{
-			const __m512i* in = (const __m512i*)(data + node_bytes + c);
+			auto in = inputs[c];
+			auto out = outputs[c];
 
-			__m512i lot = _mm512_load_si512((const __m512i*)lohi_table[c][0]);
-			__m512i hit = _mm512_srli_si512(lot, 16);
-
-			for (size_t row = 0; row < n - k; ++row)
+			for (uint8_t r = 0; r < n_outputs; ++r)
 			{
-				__m512i* out = (__m512i*)(parity + node_bytes * row);
+				auto lohi = lohi_table[mat_rows(r, c).value];
 
-				for (size_t i = 0; i < node_bytes / sizeof(__m512i); ++i)
+				for (size_t n = 0; n < num_bytes; ++n)
 				{
-					// Initial packed value that will be multiplied by c
-					__m512i A = _mm512_load_si512(&in[i]);
+					auto lo = in[n] & 0xF;
+					auto hi = in[n] >> 4;
 
-					// 4 low bits of each byte of A
-					__m512i lo = _mm512_and_si512(A, lomask);
-					lo = _mm512_shuffle_epi8(lo, lot);
-
-					// 4 high bits of each byte of A
-					__m512i hi = _mm512_and_si512(A, himask);
-					hi = _mm512_srli_epi64(hi, 4);
-					hi = _mm512_shuffle_epi8(hi, hit);
-
-					// Final value c * A for all bytes in A
-					__m512i result = _mm512_xor_si512(hi, lo);
-
-					_mm512_store_si512(&out[i], result);
+					out[n] ^= hi ^ lo;
 				}
 			}
 		}
 	}
+
+	void encode(uint8_t* shards[k], uint8_t* parity[n-k])
+	{
+		static matrix mat = build_matrix(n, k).submatrix(k, 0, n, k);
+		 
+		codesome(mat, shards, parity, n - k, num_bytes);
+	}
+
+	enum reconstruct_code
+	{
+		RECONSTRUCT_OK,
+		RECONSTRUCT_ERR_TOO_FEW_SHARDS
+	};
+
+	// Reconstructs all missing data shards if possible
+	reconstruct_code reconstruct(uint8_t* shards[n], bool present[n])
+	{
+		uint8_t n_present = std::accumulate(present, present + n, 0);
+
+		if (n_present == n)
+			return RECONSTRUCT_OK;
+
+		if (n_present < k)
+			return RECONSTRUCT_ERR_TOO_FEW_SHARDS;
+
+		uint8_t* subshards[k];
+		uint8_t indices[k];
+
+		// mr: Matrix row
+		// sr: Sub-matrix row
+		for (uint8_t mr = 0, sr = 0; mr < n && sr < k; ++mr)
+		{
+			if (present[mr])
+			{
+				subshards[sr] = shards[mr];
+				indices[sr] = mr;
+				++sr;
+			}
+		}
+
+		static matrix mat = build_matrix(n, k);
+		matrix submat = matrix(k, k);
+
+		for (uint8_t r = 0; r < k; ++r)
+			memcpy(submat.row(r), mat.row(indices[r]), k);
+		
+		matrix decode = inverse(submat);
+
+		uint8_t* outputs[n - k];
+		matrix mat_rows = matrix(n - k, k);
+
+		uint8_t outcnt = 0;
+		for (uint8_t i = 0; i < k; ++i)
+		{
+			if (!present[i])
+			{
+				outputs[outcnt] = shards[i];
+				memcpy(mat_rows.row(outcnt), decode.row(i), k);
+				++outcnt;
+			}
+		}
+
+		codesome(mat_rows, subshards, outputs, outcnt, num_bytes);
+
+		return RECONSTRUCT_OK;
+	}
 }
-#endif
+

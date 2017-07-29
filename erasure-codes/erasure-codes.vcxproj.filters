@@ -32,16 +32,7 @@
     <ClCompile Include="base_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fast_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sse2_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="avx2_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="avx512_impl.cpp">
+    <ClCompile Include="base_impl2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -24,7 +24,6 @@ namespace base_impl
 		}
 		return result;
 	}
-
 	static matrix build_matrix()
 	{
 		matrix vm = vandermonde(n, k);
