@@ -167,16 +167,36 @@ namespace erasure
 		{
 			return &data[n_cols * r];
 		}
+
+		void swaprows(size_t r1, size_t r2)
+		{
+			symbol_t* row1 = row(r1);
+			symbol_t* row2 = row(r2);
+			
+			std::swap_ranges(row1, row1 + n_cols, row2);
+		}
 	};
 
 	inline matrix inverse(matrix orig)
 	{
 		assert(orig.n_rows == orig.n_cols);
 		matrix inv = matrix(orig.n_rows, orig.n_cols, 1);
-
+	
 		for (size_t i = 0; i < orig.n_rows; ++i)
 		{
 			symbol_t div = orig(i, i);
+
+			if (div == 0)
+			{
+				size_t j = i + 1;
+				for (; j < orig.n_rows && div == 0; ++j)
+					div = orig(j, i);
+				
+				assert(div != 0);
+
+				orig.swaprows(i, j);
+				inv.swaprows(i, j);				
+			}
 
 			for (size_t j = 0; j < orig.n_cols; ++j)
 				orig(i, j) /= div;

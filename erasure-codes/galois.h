@@ -107,13 +107,13 @@ namespace erasure
 		}
 		static value_type div(value_type a, value_type b)
 		{
-			assert(b != 0);
 			if (a == 0)
 				return 0;
+			assert(b != 0);
 
-			auto log_a = log_table[a];
-			auto log_b = log_table[b];
-			auto result = log_a - log_b;
+			value_type log_a = log_table[a];
+			value_type log_b = log_table[b];
+			value_type result = log_a - log_b;
 
 			return exp_table[result];
 		}

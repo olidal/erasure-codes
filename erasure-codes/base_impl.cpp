@@ -1,6 +1,7 @@
 
 #include "galois.h"
 #include "matrix.h"
+#include "interface.h"
 
 #include <cstdint>
 #include <numeric>
@@ -9,10 +10,6 @@ using namespace erasure;
 
 namespace base_impl
 {
-	static constexpr size_t n = 20;
-	static constexpr size_t k = 16;
-	static constexpr size_t num_bytes = 1024 * 1024;
-
 	// Contains lo then hi
 	constexpr uint8_t lohi_table[][2][16] = {
 		{ { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 } },
@@ -299,38 +296,33 @@ namespace base_impl
 		uint8_t n_outputs,
 		size_t num_bytes)
 	{
-		for (uint8_t c = 0; c < n; ++c)
+		for (uint8_t c = 0; c < k; ++c)
 		{
 			auto in = inputs[c];
-			auto out = outputs[c];
 
 			for (uint8_t r = 0; r < n_outputs; ++r)
 			{
 				auto lohi = lohi_table[mat_rows(r, c).value];
+				auto out = outputs[r];
 
-				for (size_t n = 0; n < num_bytes; ++n)
+				for (size_t l = 0; l < num_bytes; ++l)
 				{
-					auto lo = in[n] & 0xF;
-					auto hi = in[n] >> 4;
+					uint8_t lo = in[l] & 0xF;
+					uint8_t hi = in[l] >> 4;
 
-					out[n] ^= hi ^ lo;
+					out[l] ^= lohi[1][hi] ^ lohi[0][lo];
 				}
 			}
 		}
 	}
 
-	void encode(uint8_t* shards[k], uint8_t* parity[n-k])
+	void encode(uint8_t* shards[k], uint8_t* parity[n - k])
 	{
 		static matrix mat = build_matrix(n, k).submatrix(k, 0, n, k);
-		 
+
 		codesome(mat, shards, parity, n - k, num_bytes);
 	}
 
-	enum reconstruct_code
-	{
-		RECONSTRUCT_OK,
-		RECONSTRUCT_ERR_TOO_FEW_SHARDS
-	};
 
 	// Reconstructs all missing data shards if possible
 	reconstruct_code reconstruct(uint8_t* shards[n], bool present[n])
@@ -363,7 +355,7 @@ namespace base_impl
 
 		for (uint8_t r = 0; r < k; ++r)
 			memcpy(submat.row(r), mat.row(indices[r]), k);
-		
+
 		matrix decode = inverse(submat);
 
 		uint8_t* outputs[n - k];
@@ -383,6 +375,18 @@ namespace base_impl
 		codesome(mat_rows, subshards, outputs, outcnt, num_bytes);
 
 		return RECONSTRUCT_OK;
+	}
+}
+
+namespace erasure
+{
+	void encode(uint8_t** shards, uint8_t** parity)
+	{
+		base_impl::encode(shards, parity);
+	}
+	reconstruct_code reconstruct(uint8_t** shards, bool* present)
+	{
+		return base_impl::reconstruct(shards, present);
 	}
 }
 
