@@ -175,12 +175,34 @@ namespace erasure
 			
 			std::swap_ranges(row1, row1 + n_cols, row2);
 		}
+
+		void append(matrix m)
+		{
+			assert(m.n_rows == n_rows);
+
+			matrix n = matrix(n_rows, n_cols + m.n_cols);
+
+			for (size_t r = 0; r < n_rows; ++r)
+			{
+				for (size_t c = 0; c < n_cols; ++c)
+				{
+					n(r, c) = (*this)(r, c);
+				}
+
+				for (size_t c = 0; c < m.n_cols; ++c)
+				{
+					n(r, c + n_cols) = m(r, c);
+				}
+			}
+
+			*this = std::move(n);
+		}
 	};
 
 	inline matrix inverse(matrix orig)
 	{
 		assert(orig.n_rows == orig.n_cols);
-		matrix inv = matrix(orig.n_rows, orig.n_cols, 1);
+		orig.append(matrix(orig.n_rows, orig.n_cols, 1));
 	
 		for (size_t i = 0; i < orig.n_rows; ++i)
 		{
@@ -194,14 +216,11 @@ namespace erasure
 				
 				assert(div != 0);
 
-				orig.swaprows(i, j);
-				inv.swaprows(i, j);				
+				orig.swaprows(i, j);		
 			}
 
 			for (size_t j = 0; j < orig.n_cols; ++j)
 				orig(i, j) /= div;
-			for (size_t j = 0; j < orig.n_cols; ++j)
-				inv(i, j) /= div;
 
 			for (size_t j = 0; j < orig.n_rows; ++j)
 			{
@@ -212,13 +231,11 @@ namespace erasure
 
 				for (size_t k = i; k < orig.n_cols; ++k)
 				{
-					symbol_t fact = orig(i, k) * mult;
-					orig(j, k) -= fact;
-					inv(j, k) -= fact;
+					orig(j, k) -= orig(i, k) * mult;
 				}
 			}
 		}
 
-		return inv;
+		return orig.submatrix(0, orig.n_rows, orig.n_rows, orig.n_cols);
 	}
 }

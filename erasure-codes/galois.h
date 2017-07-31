@@ -22,14 +22,13 @@ namespace erasure
 	private:
 		static bool gen_log_table(table_type& table, value_type polynomial)
 		{
-			for (auto& val : table)
-				val = field_max;
+			std::memset(table.data(), 255, sizeof(uint16_t) * 256);
 
 			uint64_t b = 1;
 
 			for (value_type log = 0; log < field_max; ++log)
 			{
-				if (table[b] != field_max)
+				if (table[b] != 0xFFFF)
 					return false;
 
 				table[b] = log;
@@ -45,6 +44,8 @@ namespace erasure
 		}
 		static void gen_exp_table(table_type& table, const table_type& log_table)
 		{
+			std::memset(table.data(), 255, sizeof(uint16_t) * 256);
+
 			for (value_type i = 1; i < field_max; ++i)
 			{
 				auto log = log_table[i];
@@ -73,7 +74,7 @@ namespace erasure
 	public:
 		static void init()
 		{
-			value_type poly = 1;
+			size_t poly = 1;
 			for (; poly <= field_max; ++poly)
 			{
 				if (gen_log_table(log_table, poly))
@@ -101,9 +102,9 @@ namespace erasure
 
 			value_type log_a = log_table[a];
 			value_type log_b = log_table[b];
-			value_type result = log_a + log_b;
+			uint16_t result = log_a + log_b;
 
-			return exp_table[result];
+			return exp_table[result - (result > 255 ? 255 : 0)];
 		}
 		static value_type div(value_type a, value_type b)
 		{
@@ -113,9 +114,9 @@ namespace erasure
 
 			value_type log_a = log_table[a];
 			value_type log_b = log_table[b];
-			value_type result = log_a - log_b;
+			int16_t result = log_a - log_b;
 
-			return exp_table[result];
+			return exp_table[result + (result < 0 ? 255 : 0)];
 		}
 		static value_type exp(value_type a, value_type n)
 		{
@@ -124,8 +125,8 @@ namespace erasure
 			if (a == 0)
 				return 0;
 
-			auto log_a = log_table[a];
-			auto result = log_a * n;
+			value_type log_a = log_table[a];
+			value_type result = log_a * n;
 			return exp_table[result];
 		}
 	};
