@@ -8,6 +8,7 @@ using galois::symbol;
 static constexpr size_t n = 4;
 static constexpr size_t k = 3;
 
+template<size_t n, size_t k>
 static matrix<n, k> vandermonde()
 {
 	matrix<n, k> result;
@@ -20,9 +21,10 @@ static matrix<n, k> vandermonde()
 	}
 	return result;
 }
+template<size_t n, size_t k>
 static matrix<n, k> build_matrix()
 {
-	auto vm = vandermonde();
+	auto vm = vandermonde<n, k>();
 	auto inv = vm.submatrix<k, k>().inverse();
 	return vm * inv;
 }

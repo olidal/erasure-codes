@@ -14,7 +14,7 @@ namespace galois
 		}
 	}
 
-	int invert_mat(symbol *src, size_t k)
+	int invert_matrix(symbol *src, size_t k)
 	{
 		symbol c, *p;
 		int irow, icol, row, col, i, ix;
@@ -111,7 +111,7 @@ namespace galois
 			}
 			id_row[icol] = 0;
 		} /* done all columns */
-		for (col = k - 1; col >= 0; col--) {
+		for (col = (int)k - 1; col >= 0; col--) {
 			if (indxr[col] < 0 || indxr[col] >= k)
 				fprintf(stderr, "AARGH, indxr[col] %d\n", indxr[col]);
 			else if (indxc[col] < 0 || indxc[col] >= k)

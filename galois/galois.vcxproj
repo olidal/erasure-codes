@@ -113,7 +113,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrix.cpp" />
-    <ClCompile Include="matrix.h" />
+    <ClInclude Include="matrix.h" />
     <ClCompile Include="ops.cpp" />
   </ItemGroup>
   <ItemGroup>

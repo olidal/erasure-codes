@@ -11,9 +11,7 @@ namespace galois
 	static constexpr size_t rows = 16;
 	static constexpr size_t cols = 16;
 
-	//typedef double symbol;
-
-	int invert_mat(symbol* src, size_t k);
+	int invert_matrix(symbol* src, size_t k);
 
 	template<size_t rows, size_t cols>
 	struct matrix
@@ -61,67 +59,8 @@ namespace galois
 		matrix inverse() const
 		{
 			matrix ninv = *this;
-			invert_mat((symbol*)ninv.data, rows);
+			invert_matrix((symbol*)ninv.data, rows);
 			return ninv;
-
-			matrix mat = *this;
-			matrix inv = matrix(1);
-
-			for (size_t r = 0; r < rows; ++r)
-			{
-				if (mat(r, r) == 0)
-				{
-					for (size_t i = r + 1; i < rows; ++i)
-					{
-						if (mat(i, r) != 0)
-						{
-							mat.swaprows(r, i);
-							break;
-						}
-					}
-				}
-
-				// Matrix is singular
-				assert(mat(r, r) != 0);
-
-				{
-					symbol scale = 1 / mat(r, r);
-					for (size_t c = 0; c < cols; ++c)
-					{
-						mat(r, c) *= scale;
-						inv(r, c) *= scale;
-					}
-				}
-
-				for (size_t i = 0; i < rows; ++i)
-				{
-					if (i == r)
-						continue;
-
-					symbol scale = mat(i, r);
-
-					for (size_t c = 0; c < cols; ++c)
-					{
-						mat(i, c) -= scale * mat(r, c);
-						inv(i, c) -= scale * mat(r, c);
-					}
-				}
-			}
-
-			//for (size_t d = 0; d < rows; ++d)
-			//{
-			//	for (size_t i = 0; i < d; ++i)
-			//	{
-			//		symbol scale = mat(i, d);
-			//		for (size_t c = 0; c < cols; ++c)
-			//		{
-			//			mat(i, c) -= scale * mat(d, c);
-			//			inv(i, c) -= scale * mat(d, c);
-			//		}
-			//	}
-			//}
-
-			return inv;
 		}
 	
 		template<size_t r1, size_t c1, size_t r2, size_t c2>
