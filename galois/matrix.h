@@ -30,6 +30,15 @@ namespace galois
 			return data[r][c];
 		}
 
+		symbol* operator[](size_t r)
+		{
+			return data[r];
+		}
+		const symbol* operator[](size_t r) const
+		{
+			return data[r];
+		}
+
 		matrix() = default;
 		matrix(symbol diag)
 		{
@@ -106,5 +115,26 @@ namespace galois
 		}
 		
 		return r;
+	}
+
+	template<size_t n, size_t k>
+	static matrix<n, k> vandermonde()
+	{
+		matrix<n, k> result;
+		for (uint8_t r = 0; r < matrix<n, k>::n_rows; ++r)
+		{
+			for (uint8_t c = 0; c < matrix<n, k>::n_cols; ++c)
+			{
+				result(r, c) = symbol::exp(r, c);
+			}
+		}
+		return result;
+	}
+	template<size_t n, size_t k>
+	static matrix<n, k> build_matrix()
+	{
+		auto vm = vandermonde<n, k>();
+		auto inv = vm.submatrix<k, k>().inverse();
+		return vm * inv;
 	}
 }

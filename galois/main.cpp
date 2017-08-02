@@ -1,43 +1,44 @@
-#include "matrix.h"
+#include "encoder.h"
 
-#include <sstream>
+#include <random>
 
 using galois::matrix;
 using galois::symbol;
 
-static constexpr size_t n = 4;
-static constexpr size_t k = 3;
+static constexpr size_t n = 6;
+static constexpr size_t k = 4;
+static constexpr size_t shard_size = k;
 
-template<size_t n, size_t k>
-static matrix<n, k> vandermonde()
-{
-	matrix<n, k> result;
-	for (uint8_t r = 0; r < matrix<n, k>::n_rows; ++r)
-	{
-		for (uint8_t c = 0; c < matrix<n, k>::n_cols; ++c)
-		{
-			result(r, c) = pow(r, c);
-		}
-	}
-	return result;
-}
-template<size_t n, size_t k>
-static matrix<n, k> build_matrix()
-{
-	auto vm = vandermonde<n, k>();
-	auto inv = vm.submatrix<k, k>().inverse();
-	return vm * inv;
-}
-
-symbol mat[] = {
-	0, 1, 1,
-	1, 0, 1,
-	1, 1, 1
+bool present[n] = {
+	true,
+	false,
+	true,
+	false,
+	true,
+	true
 };
 
 int main()
 {
-	auto m = matrix<3, 3>(mat);
-	auto n = m.inverse();
-	auto x = m * n;
+	symbol data[shard_size * n];
+	symbol data2[shard_size * n];
+
+	std::uniform_int_distribution<unsigned> dist{ 0, 256 };
+	std::mt19937 eng;
+
+	for (size_t i = 0; i < shard_size * k; ++i)
+	{
+		data[i] = '0' + (uint8_t)i;
+	}
+
+	symbol* ptrs[n];
+
+	for (size_t i = 0; i < n; ++i)
+		ptrs[i] = data + shard_size * i;
+
+	galois::encode<n, k>(ptrs, ptrs + k, shard_size);
+
+	memcpy(data2, data, sizeof(data));
+
+	galois::recover<n, k>(ptrs, present, shard_size);
 }
