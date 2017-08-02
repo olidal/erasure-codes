@@ -37,7 +37,15 @@ namespace galois
 		size_t shard_size)
 	{
 		size_t n_present = 0;
-		for (size_t i = 0; i < n; ++i)
+		for (size_t i = 0; i < k; ++i)
+			n_present += present[i];
+
+		if (n_present == k)
+			// All data shards are present
+			// no recovery required
+			return true;
+
+		for (size_t i = k; i < n; ++i)
 			n_present += present[i];
 
 		matrix<k, k> decode_mat;
@@ -61,7 +69,7 @@ namespace galois
 				}
 			}
 			
-			if (j != k)
+			if (j < k)
 				// We don't have enough shards to recover the data
 				return false;
 
