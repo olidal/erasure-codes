@@ -5,4 +5,6 @@ file(GLOB sources
 	*.h
 )
 
+add_definitions(-DGALOIS_BUILD)
+
 add_library(galois SHARED ${sources})

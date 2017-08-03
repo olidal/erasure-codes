@@ -11,7 +11,7 @@ namespace galois
 	static constexpr size_t rows = 16;
 	static constexpr size_t cols = 16;
 
-	int invert_matrix(symbol* src, size_t k);
+	int GALOIS_EXPORT invert_matrix(symbol* src, size_t k);
 
 	template<size_t rows, size_t cols>
 	struct matrix
@@ -37,6 +37,15 @@ namespace galois
 		const symbol* operator[](size_t r) const
 		{
 			return data[r];
+		}
+
+		bool operator==(const matrix& m) const
+		{
+			return std::memcmp(data, m.data, sizeof(data)) != 0;
+		}
+		bool operator!=(const matrix& m) const
+		{
+			return !(*this == m);
 		}
 
 		matrix() = default;

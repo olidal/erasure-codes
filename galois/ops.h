@@ -2,13 +2,25 @@
 
 #include <cstdint>
 
+#define GALOIS_BUILD_DLL
+
+#ifdef GALOIS_BUILD_DLL
+#	ifdef GALOIS_BUILD
+#		define GALOIS_EXPORT __declspec(dllexport)
+#	else
+#		define GALOIS_EXPORT __declspec(dllimport)
+#	endif
+#else
+#	define GALOIS_EXPORT
+#endif
+
 namespace galois
 {
-	uint8_t mul(uint8_t a, uint8_t b);
-	uint8_t div(uint8_t a, uint8_t b);
-	uint8_t exp(uint8_t a, uint8_t b);
-	uint8_t add(uint8_t a, uint8_t b);
-	uint8_t sub(uint8_t a, uint8_t b);
+	uint8_t GALOIS_EXPORT mul(uint8_t a, uint8_t b);
+	uint8_t GALOIS_EXPORT div(uint8_t a, uint8_t b);
+	uint8_t GALOIS_EXPORT exp(uint8_t a, uint8_t b);
+	uint8_t GALOIS_EXPORT add(uint8_t a, uint8_t b);
+	uint8_t GALOIS_EXPORT sub(uint8_t a, uint8_t b);
 
 	struct symbol
 	{
