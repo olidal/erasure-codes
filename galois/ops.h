@@ -43,17 +43,36 @@ namespace galois
 			return value;
 		}
 
+		bool operator <(const symbol& v) const
+		{
+			return value < v.value;
+		}
+		bool operator >(const symbol& v) const
+		{
+			return value > v.value;
+		}
+
+		bool operator ==(const symbol& v) const
+		{
+			return value == v.value;
+		}
+
 		template<typename T>
-		bool operator ==(const T& v)
+		bool operator ==(const T& v) const
 		{
 			return value == v;
 		}
 		template<typename T>
-		bool operator !=(const T& v)
+		bool operator !=(const T& v) const
 		{
 			return !(*this == v);
 		}
 	};
+
+	inline symbol abs(const symbol& s)
+	{
+		return s;
+	}
 
 	inline symbol operator+(symbol a, symbol b)
 	{

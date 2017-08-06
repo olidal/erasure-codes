@@ -41,7 +41,7 @@ namespace galois
 
 		bool operator==(const matrix& m) const
 		{
-			return std::memcmp(data, m.data, sizeof(data)) != 0;
+			return std::memcmp(data, m.data, sizeof(data)) == 0;
 		}
 		bool operator!=(const matrix& m) const
 		{
@@ -77,7 +77,8 @@ namespace galois
 		matrix inverse() const
 		{
 			matrix ninv = *this;
-			invert_matrix((symbol*)ninv.data, rows);
+			int result = invert_matrix((symbol*)ninv.data, rows);
+			assert(result == 0);
 			return ninv;
 		}
 	

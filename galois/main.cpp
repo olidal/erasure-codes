@@ -40,5 +40,13 @@ int main()
 
 	memcpy(data2, data, sizeof(data));
 
+	for (size_t i = 0; i < n; ++i)
+	{
+		if (!present[i / 3])
+		{
+			data[i] = 0xFF;
+		}
+	}
+
 	galois::recover<n, k>(ptrs, present, shard_size);
 }

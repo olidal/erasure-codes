@@ -1,10 +1,10 @@
 #include "matrix.h"
 
-#include <gtest\gtest.h>
+#include "catch.hpp"
 
 using namespace galois;
 
-TEST(matrix, equal_to_self)
+TEST_CASE("Matrix equal to self", "[matrix]")
 {
 	symbol matrix_data[] = {
 		0, 1, 1,
@@ -14,9 +14,9 @@ TEST(matrix, equal_to_self)
 
 	matrix<3, 3> mat = matrix_data;
 
-	ASSERT_EQ(mat, mat);
+	REQUIRE(mat == mat);
 }
-TEST(matrix, inverse_multiplied)
+TEST_CASE("Matrix inverse * self is identity", "[matrix]")
 {
 	symbol matrix_data[] = {
 		0, 1, 1,
@@ -26,6 +26,7 @@ TEST(matrix, inverse_multiplied)
 
 	matrix<3, 3> mat = matrix_data;
 	matrix<3, 3> inv = mat.inverse();
+	auto result = inv * mat;
 	matrix<3, 3> identity = matrix<3, 3>(1);
-	ASSERT_EQ(inv * mat, identity);
+	REQUIRE(inv * mat == identity);
 }
