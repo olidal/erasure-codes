@@ -18,7 +18,7 @@ find_package(boost REQUIRED COMPONENTS numeric)
 
 add_definitions(-DGALOIS_BUILD)
 
-add_library(galois SHARED ${sources})
+add_library(galois ${sources})
 
 target_include_directories(galois PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(galois PRIVATE ${Boost_LIBRARIES})
+target_link_libraries(galois PUBLIC ${Boost_LIBRARIES})

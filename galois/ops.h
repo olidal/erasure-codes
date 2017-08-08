@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#define GALOIS_BUILD_DLL
-
 #ifdef GALOIS_BUILD_DLL
 #	ifdef GALOIS_BUILD
 #		define GALOIS_EXPORT __declspec(dllexport)

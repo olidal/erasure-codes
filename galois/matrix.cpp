@@ -18,7 +18,7 @@ namespace galois
 	{
 		typedef ublas::permutation_matrix<std::size_t> pmatrix;
 
-		ublas::matrix<symbol> A{ k, k }, inverse;
+		ublas::matrix<symbol> A{ k, k };
 		pmatrix pm(A.size1());
 		
 		std::memcpy(A.data().begin(), src, sizeof(symbol) * k * k);
@@ -27,7 +27,7 @@ namespace galois
 		if (res != 0)
 			return (int)res;
 
-		inverse.assign(ublas::identity_matrix<symbol>(A.size1()));
+		ublas::matrix<symbol> inverse = ublas::identity_matrix<symbol>(k);
 
 		ublas::lu_substitute(A, pm, inverse);
 

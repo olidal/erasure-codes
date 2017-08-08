@@ -77,8 +77,7 @@ namespace galois
 		matrix inverse() const
 		{
 			matrix ninv = *this;
-			int result = invert_matrix((symbol*)ninv.data, rows);
-			assert(result == 0);
+			invert_matrix((symbol*)ninv.data, rows);
 			return ninv;
 		}
 	
