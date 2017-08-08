@@ -8,3 +8,4 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(galois)
 add_subdirectory(galois-test)
+add_subdirectory(erasure-codes)
