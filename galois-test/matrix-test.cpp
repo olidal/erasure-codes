@@ -28,5 +28,19 @@ TEST_CASE("Matrix inverse * self is identity", "[matrix]")
 
 TEST_CASE("Large inverse", "[matrix]")
 {
-	
+	constexpr size_t sz = 128;
+
+	matrix<sz, sz>* matrices = new matrix<sz, sz>[3];
+
+	matrix<sz, sz>& mat = matrices[0];
+	matrix<sz, sz>& inv = matrices[1];
+	matrix<sz, sz>& identity = matrices[2];
+
+	mat = vandermonde<sz, sz>();
+	inv = mat.inverse();
+	identity = matrix<sz, sz>(1);
+
+	REQUIRE(inv * mat == identity);
+
+	delete[] matrices;
 }
