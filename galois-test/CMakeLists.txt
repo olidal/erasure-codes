@@ -16,5 +16,5 @@ foreach(src_file ${sources})
 	target_include_directories(${test_name} PRIVATE ../galois)
 	target_link_libraries(${test_name} PRIVATE galois)
 
-	add_test(NAME ${test_name} COMMAND galois-test)
+	add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach(src_file)
