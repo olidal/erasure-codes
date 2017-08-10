@@ -20,7 +20,7 @@ namespace erasure
 	void encode(
 		const encode_parameters& params,
 		const uint8_t* const* shards,
-		uint8_t** parity)
+		uint8_t* const* parity)
 	{
 		matrix mat = ublas::subrange(build_matrix(params.n, params.k), params.k, params.n, 0, params.k);
 
@@ -34,8 +34,8 @@ namespace erasure
 
 	bool recover(
 		const encode_parameters& params,
-		uint8_t** shards,
-		bool* present)
+		uint8_t* const* shards,
+		const bool* present)
 	{
 		typedef ublas::matrix_row<matrix> mat_row;
 

@@ -13,10 +13,10 @@ namespace erasure
 	void encode(
 		const encode_parameters& params,
 		const uint8_t* const* shards,
-		uint8_t** parity);
+		uint8_t* const* parity);
 
 	bool recover(
 		const encode_parameters& params,
-		uint8_t** shards,
-		bool* present);
+		uint8_t* const* shards,
+		const bool* present);
 }
