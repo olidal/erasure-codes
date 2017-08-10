@@ -9,10 +9,10 @@ namespace erasure
 		size_t k; // Number of data shards
 		size_t data_size; // Size of each shard (in bytes)
 	};
-
+	
 	void encode(
 		const encode_parameters& params,
-		uint8_t** shards,
+		const uint8_t* const* shards,
 		uint8_t** parity);
 
 	bool recover(
