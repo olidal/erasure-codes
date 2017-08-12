@@ -68,7 +68,7 @@ namespace erasure
 			shards,
 			parity,
 			params.k,
-			params.n,
+			params.n - params.k,
 			params.data_size);
 	}
 
