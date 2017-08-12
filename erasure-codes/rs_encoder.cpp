@@ -14,8 +14,47 @@ namespace erasure
 #	define stackalloc(size) alloca(size)
 #	define stackfree(ptr);
 #endif
-	
+
 	using namespace boost::numeric;
+
+	void code_some_shards(
+		const matrix& mat_rows,
+		const uint8_t* const * inputs,
+		uint8_t* const * outputs,
+		size_t n_inputs,
+		size_t n_outputs,
+		size_t data_size)
+	{
+		for (size_t c = 0; c < n_inputs; ++c)
+		{
+			const uint8_t* in = inputs[c];
+			if (c == 0)
+			{
+				for (size_t r = 0; r < n_outputs; ++r)
+				{
+					uint8_t* out = outputs[r];
+					uint8_t val = mat_rows(r, c).value;
+					for (size_t i = 0; i < data_size; ++i)
+					{
+						out[i] = mul(in[i], val);
+					}
+				}
+			}
+			else
+			{
+				for (size_t r = 0; r < n_outputs; ++r)
+				{
+					uint8_t* out = outputs[r];
+					uint8_t val = mat_rows(r, c).value;
+					for (size_t i = 0; i < data_size; ++i)
+					{
+						out[i] = add(out[i], mul(in[i], val));
+					}
+				}
+
+			}
+		}
+	}
 
 	void encode(
 		const encode_parameters& params,
@@ -24,11 +63,12 @@ namespace erasure
 	{
 		matrix mat = ublas::subrange(build_matrix(params.n, params.k), params.k, params.n, 0, params.k);
 
-		matrix_mul(
+		code_some_shards(
 			mat,
 			shards,
 			parity,
-			params.n - params.k,
+			params.k,
+			params.n,
 			params.data_size);
 	}
 
@@ -61,37 +101,39 @@ namespace erasure
 			// to recover the data
 			return false;
 
-		uint8_t** shardptrs = (uint8_t**)stackalloc(sizeof(uint8_t*) * params.k);
+		uint8_t** subshards = (uint8_t**)stackalloc(sizeof(uint8_t*) * params.k);
+		uint8_t** outputs = (uint8_t**)stackalloc(sizeof(uint8_t*) * params.k);
+		
+		matrix m = build_matrix(params.n, params.k);
+		matrix decodemat = matrix{ params.k, params.k };
 
-		matrix enc_mat = build_matrix(params.n, params.k);
-		matrix enc_submat{ params.k, params.k };
-
-		for (size_t i = 0, j = 0; j < params.k; ++i)
+		for (size_t i = 0, j = 0, k = 0; i < params.n; ++i)
 		{
-			// This should have been verified at the 
-			// start of the function. If those checks
-			// are deleted then this will fail if it
-			// is not possible to recover the data
-			assert(i < params.n);
 			if (present[i])
 			{
-				shardptrs[j] = shards[i];
-				mat_row(enc_submat, j) = mat_row(enc_mat, i);
+				mat_row(decodemat, j) = mat_row(m, i);
+				subshards[j] = shards[i];
 				++j;
+			}
+			else
+			{
+				outputs[k] = shards[i];
+				++k;
 			}
 		}
 
-		{
-			bool result = inverse(enc_submat);
-			// If the matrix is not inverible then 
-			// something is wrong with build_matrix.
-			// This should not happen.
-			assert(result);
-		}
+		inverse(decodemat);
 
-		matrix_mul(enc_submat, shardptrs, shards, params.k, params.data_size);
+		code_some_shards(
+			decodemat,
+			subshards,
+			outputs,
+			params.k,
+			params.n - params.k,
+			params.data_size);
 
-		stackfree(shardptrs);
+		stackfree(subshards);
+		stackfree(outputs);
 
 		return true;
 	}

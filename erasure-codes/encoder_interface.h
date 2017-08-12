@@ -4,17 +4,23 @@
 
 namespace erasure
 {
-	void matrix_mul(
-		const matrix& mat,
-		const uint8_t* const* shards,
-		uint8_t* const* outputs,
-		uint8_t n_ouputs,
-		size_t num_bytes);
-	
-	void matrix_mul_base(
-		const matrix& mat,
-		const uint8_t* const* shards,
-		uint8_t* const* outputs,
-		uint8_t n_ouputs,
-		size_t num_bytes);
+	void code_some_shards(
+		const matrix& mat_rows,
+		const uint8_t* const * inputs,
+		uint8_t* const * outputs,
+		size_t n_inputs,
+		size_t n_outputs,
+		size_t data_size);
+
+	/*
+		Preconditions:
+			No alignment or size restrictions.
+	*/
+	void encode_basic(
+		const matrix& mat_rows,
+		const uint8_t* const * inputs,
+		uint8_t* const * outputs,
+		size_t n_inputs,
+		size_t n_outputs,
+		size_t data_size);
 }
