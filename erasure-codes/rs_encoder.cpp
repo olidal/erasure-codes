@@ -17,41 +17,30 @@ namespace erasure
 
 	using namespace boost::numeric;
 
-	void code_some_shards(
-		const matrix& mat_rows,
-		const uint8_t* const * inputs,
-		uint8_t* const * outputs,
+	void matrix_mul(
+		const matrix& mat,
+		const uint8_t* const* inputs,
+		uint8_t* const* outputs,
 		size_t n_inputs,
 		size_t n_outputs,
-		size_t data_size)
+		size_t num_bytes)
 	{
-		for (size_t c = 0; c < n_inputs; ++c)
-		{
-			const uint8_t* in = inputs[c];
-			if (c == 0)
-			{
-				for (size_t r = 0; r < n_outputs; ++r)
-				{
-					uint8_t* out = outputs[r];
-					uint8_t val = mat_rows(r, c).value;
-					for (size_t i = 0; i < data_size; ++i)
-					{
-						out[i] = mul(in[i], val);
-					}
-				}
-			}
-			else
-			{
-				for (size_t r = 0; r < n_outputs; ++r)
-				{
-					uint8_t* out = outputs[r];
-					uint8_t val = mat_rows(r, c).value;
-					for (size_t i = 0; i < data_size; ++i)
-					{
-						out[i] = add(out[i], mul(in[i], val));
-					}
-				}
+		for (size_t i = 0; i < n_outputs; ++i)
+			std::memset(outputs[i], 0, num_bytes);
 
+		for (size_t r = 0; r < n_outputs; ++r)
+		{
+			uint8_t* out = outputs[r];
+
+			for (size_t c = 0; c < n_inputs; ++c)
+			{
+				uint8_t val = mat(r, c).value;
+				const uint8_t* in = inputs[c];
+
+				for (size_t i = 0; i < num_bytes; ++i)
+				{
+					out[i] = add(out[i], mul(in[i], val));
+				}
 			}
 		}
 	}
@@ -63,7 +52,7 @@ namespace erasure
 	{
 		matrix mat = ublas::subrange(build_matrix(params.n, params.k), params.k, params.n, 0, params.k);
 
-		code_some_shards(
+		matrix_mul(
 			mat,
 			shards,
 			parity,
@@ -77,8 +66,6 @@ namespace erasure
 		uint8_t* const* shards,
 		const bool* present)
 	{
-		typedef ublas::matrix_row<matrix> mat_row;
-
 		uint8_t n_present =
 			std::accumulate(
 				present,
@@ -101,35 +88,47 @@ namespace erasure
 			// to recover the data
 			return false;
 
-		uint8_t** subshards = (uint8_t**)stackalloc(sizeof(uint8_t*) * params.k);
-		uint8_t** outputs = (uint8_t**)stackalloc(sizeof(uint8_t*) * params.k);
-		
+		uint8_t** subshards = (uint8_t**)stackalloc(
+			sizeof(uint8_t*) * params.k);
+
+		uint8_t** outputs = (uint8_t**)stackalloc(
+			sizeof(uint8_t*) * (params.n - params.k));
+
 		matrix m = build_matrix(params.n, params.k);
 		matrix decodemat = matrix{ params.k, params.k };
 
-		for (size_t i = 0, j = 0, k = 0; i < params.n; ++i)
+		for (size_t i = 0, j = 0; i < params.n; ++i)
 		{
 			if (present[i])
 			{
-				mat_row(decodemat, j) = mat_row(m, i);
+				ublas::row(decodemat, j) = ublas::row(m, i);
 				subshards[j] = shards[i];
 				++j;
-			}
-			else
-			{
-				outputs[k] = shards[i];
-				++k;
 			}
 		}
 
 		inverse(decodemat);
 
-		code_some_shards(
+		size_t n_outputs = 0;
+		for (size_t i = 0, j = 0; i < params.k; ++i)
+		{
+			if (!present[i])
+			{
+				outputs[j] = shards[i];
+				ublas::row(decodemat, j) = ublas::row(decodemat, i);
+				++j;
+			}
+			n_outputs = j;
+		}
+
+		decodemat = ublas::subrange(decodemat, 0, n_outputs, 0, params.k);
+		
+		matrix_mul(
 			decodemat,
 			subshards,
 			outputs,
 			params.k,
-			params.n - params.k,
+			n_outputs,
 			params.data_size);
 
 		stackfree(subshards);

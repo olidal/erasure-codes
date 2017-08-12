@@ -4,11 +4,12 @@ using namespace erasure;
 
 #include <random>
 
-uint8_t data[1024];
-uint8_t result[1024];
 static constexpr size_t k = 16;
 static constexpr size_t n = 20;
-static constexpr size_t data_size = sizeof(data) / sizeof(uint8_t) / k;
+static constexpr size_t data_size = k;
+
+uint8_t data[data_size * k];
+uint8_t result[data_size * k];
 
 uint8_t* ptrs[n];
 uint8_t parity[data_size * (n - k)];
