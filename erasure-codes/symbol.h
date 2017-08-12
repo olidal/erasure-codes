@@ -23,7 +23,7 @@ namespace erasure
 
 		static symbol exp(symbol a, symbol b)
 		{
-			return galois::exp(a.value, b.value);
+			return erasure::exp(a.value, b.value);
 		}
 
 		explicit operator uint8_t() const

@@ -17,6 +17,5 @@ endif()
 
 find_package(boost REQUIRED COMPONENTS numeric)
 
-add_subdirectory(galois)
-add_subdirectory(galois-test)
 add_subdirectory(erasure-codes)
+add_subdirectory(erasure-test)

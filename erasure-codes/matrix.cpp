@@ -1,3 +1,8 @@
+
+#ifdef _MSC_VER
+#	pragma warning(disable:4267 4996)
+#endif
+
 #include "matrix.h"
 
 #include <boost/numeric/ublas/lu.hpp>
@@ -14,7 +19,7 @@ namespace erasure
 	{
 		assert(mat.size1() == mat.size2());
 
-		permutation_matrix<symbol> pm(mat.size1());
+		permutation_matrix<uint8_t> pm(mat.size1());
 
 		if (ublas::lu_factorize(mat, pm) != 0)
 			return false;
@@ -32,9 +37,9 @@ namespace erasure
 	{
 		matrix m{ n, k };
 		
-		for (size_t r = 0; r < n; ++r)
+		for (uint8_t r = 0; r < n; ++r)
 		{
-			for (size_t c = 0; c < k; ++c)
+			for (uint8_t c = 0; c < k; ++c)
 			{
 				m(r, c) = symbol::exp(r, c);
 			}

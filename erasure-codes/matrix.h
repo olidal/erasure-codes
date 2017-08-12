@@ -2,6 +2,8 @@
 
 #include "symbol.h"
 
+#define BOOST_UBLAS_NDEBUG
+
 #include <boost/numeric/ublas/matrix.hpp>
 
 namespace erasure
