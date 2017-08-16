@@ -13,6 +13,9 @@ namespace erasure
 #else
 #	define stackalloc(size) alloca(size)
 #	define stackfree(ptr);
+	// Use this to disable returned pointer checks
+	// for alloca since it should never be null in
+	// cases other than n_data == n_shards
 #	define STACKALLOC_IS_ALLOCA
 #endif
 

@@ -22,6 +22,7 @@ namespace erasure
 	};
 	enum error_code
 	{
+		// The operation completed successfully
 		SUCCESS = 0,
 		RECOVER_FAILED,
 		INVALID_ARGUMENTS,
