@@ -5,18 +5,67 @@ namespace erasure
 {
 	struct encode_parameters
 	{
-		size_t n; // Total number of shards
-		size_t k; // Number of data shards
+		uint8_t n; // Total number of shards
+		uint8_t k; // Number of data shards
 		size_t data_size; // Size of each shard (in bytes)
 	};
-	
-	void encode(
+	struct rs_encoder;
+
+	enum encoder_flags
+	{
+		DEFAULT = 0,
+		SHARD_ALIGNED_BY_8  = 0x1,
+		SHARD_ALIGNED_BY_16 = 1 << 1,
+		SHARD_ALIGNED_BY_32 = 1 << 2,
+		SHARD_ALIGNED_BY_64 = 1 << 3,
+		FORCE_SSE2 = 0xA
+	};
+	enum error_code
+	{
+		SUCCESS = 0,
+		RECOVER_FAILED,
+		INVALID_ARGUMENTS,
+		INTERNAL_ERROR
+	};
+
+	rs_encoder* create_encoder(
 		const encode_parameters& params,
+		encoder_flags flags = DEFAULT
+	);
+	void destroy_encoder(rs_encoder* encoder);
+
+	error_code encode(
+		rs_encoder* encoder,
 		const uint8_t* const* shards,
 		uint8_t* const* parity);
+	/* Encodes a subset of the parity shards given
+	   the data shards. Unused parity shard pointers
+	   are not accessed and may be null.
+	   
+	   PARAMETERS:
+	   encoder: 
+	      An encoder instance.
+	   shards:  
+	      The data shards from which the parity
+	      shards are calculated.
+	   parity:
+	      The parity shards.
+	   should_encode:
+	      A boolean array specifying which parity
+	      shards are to be calculated.
+	*/
+	error_code encode_partial(
+		rs_encoder* encoder,
+		const uint8_t* const* shards,
+		uint8_t* const* parity,
+		const bool* should_encode);
 
-	bool recover(
-		const encode_parameters& params,
+	error_code recover_data(
+		rs_encoder* encoder,
+		uint8_t* const* shards,
+		const bool* present);
+	error_code recover(
+		rs_encoder* encoder,
 		uint8_t* const* shards,
 		const bool* present);
 }

@@ -51,11 +51,15 @@ int main()
 
 	encode_parameters params = { n, k, data_size };
 
-	encode(params, ptrs, ptrs + k);
+	rs_encoder* encoder = create_encoder(params);
+
+	encode(encoder, ptrs, ptrs + k);
 
 	memcpy(result, data, sizeof(data));
 
-	recover(params, ptrs, present);
+	recover(encoder, ptrs, present);
+
+	destroy_encoder(encoder);
 
 	if (memcmp(data, result, sizeof(data)) != 0)
 		return 1;
