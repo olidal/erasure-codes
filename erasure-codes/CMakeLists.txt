@@ -2,6 +2,7 @@
 file(GLOB sources
 	*.h
 	*.cpp
+	encode/*.cpp
 )
 
 add_library(erasure ${sources})
