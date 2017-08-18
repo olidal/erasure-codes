@@ -13,12 +13,7 @@ namespace erasure
 
 	enum encoder_flags
 	{
-		DEFAULT = 0,
-		SHARD_ALIGNED_BY_8  = 0x1,
-		SHARD_ALIGNED_BY_16 = 1 << 1,
-		SHARD_ALIGNED_BY_32 = 1 << 2,
-		SHARD_ALIGNED_BY_64 = 1 << 3,
-		FORCE_SSE2 = 0xA
+		DEFAULT = 0
 	};
 	enum error_code
 	{
@@ -31,8 +26,7 @@ namespace erasure
 
 	rs_encoder* create_encoder(
 		const encode_parameters& params,
-		encoder_flags flags = DEFAULT
-	);
+		encoder_flags flags = DEFAULT);
 	void destroy_encoder(rs_encoder* encoder);
 
 	error_code encode(

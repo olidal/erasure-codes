@@ -6,7 +6,7 @@ namespace erasure
 		Reference implementation for encoding.
 		This is the slowest implmentation.
 	*/
-	void matrix_mul(
+	void matrix_mul_basic(
 		const matrix& mat,
 		const uint8_t* const* inputs,
 		uint8_t* const* outputs,

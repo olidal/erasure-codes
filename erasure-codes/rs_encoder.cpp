@@ -24,7 +24,6 @@ namespace erasure
 	struct rs_encoder
 	{
 		matrix coding_mat;
-		matrix_mul_proc mat_mul;
 		size_t data_size;
 		uint8_t n_data;
 		uint8_t n_shards;
@@ -95,9 +94,6 @@ namespace erasure
 		encoder->n_shards = params.n;
 		encoder->n_parity = params.n - params.k;
 		encoder->data_size = params.data_size;
-
-		// For now only use basic proc
-		encoder->mat_mul = matrix_mul;
 
 		return encoder;
 	}
@@ -260,7 +256,7 @@ namespace erasure
 			0, n_outputs,
 			0, encoder->n_data);
 
-		encoder->mat_mul(
+		matrix_mul(
 			decodemat,
 			subshards,
 			outputs,
