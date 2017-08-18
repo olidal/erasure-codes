@@ -164,12 +164,10 @@ namespace erasure
 
 	uint8_t exp(uint8_t a, uint8_t n)
 	{
-		if (n == 0 && a == 0)
+		if (n == 0)
 			return 1;
 		if (a == 0)
 			return 0;
-		if (n == 0)
-			return 1;
 
 		uint8_t log_a = log_table[a];
 		uint16_t result = log_a * n;
