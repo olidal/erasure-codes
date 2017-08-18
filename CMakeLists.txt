@@ -19,3 +19,4 @@ find_package(boost REQUIRED COMPONENTS numeric)
 
 add_subdirectory(erasure-codes)
 add_subdirectory(erasure-test)
+add_subdirectory(lohi-generator)
