@@ -31,9 +31,7 @@ namespace erasure
 					uint8_t idx2 = in_val >> 4;
 					uint8_t lo_val = lo[idx1];
 					uint8_t hi_val = hi[idx2];
-					uint8_t result1 = lo_val ^ hi_val ^ out[i];
-					uint8_t result2 = mul(val, in_val) ^ out[i];
-					out[i] = result1;
+					out[i] ^= lo_val ^ hi_val;
 				}
 			}
 		}

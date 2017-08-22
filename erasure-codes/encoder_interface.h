@@ -42,4 +42,16 @@ namespace erasure
 		size_t n_inputs,
 		size_t n_outputs,
 		size_t num_bytes);
+
+	/*
+	Preconditions:
+	Inputs 16 byte aligned.
+	*/
+	void matrix_mul_sse(
+		const matrix& mat,
+		const uint8_t* const* inputs,
+		uint8_t* const* outputs,
+		size_t n_inputs,
+		size_t n_outputs,
+		size_t num_bytes);
 }
