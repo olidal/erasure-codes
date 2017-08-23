@@ -6,7 +6,7 @@ using namespace erasure;
 
 static constexpr size_t k = 16;
 static constexpr size_t n = 20;
-static constexpr size_t data_size = k;
+static constexpr size_t data_size = k * 128;
 
 __declspec(align(64)) uint8_t data[data_size * k];
 __declspec(align(64)) uint8_t result[data_size * k];

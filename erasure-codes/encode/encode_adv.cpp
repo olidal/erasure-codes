@@ -31,7 +31,8 @@ namespace erasure
 					uint8_t idx2 = in_val >> 4;
 					uint8_t lo_val = lo[idx1];
 					uint8_t hi_val = hi[idx2];
-					out[i] ^= lo_val ^ hi_val;
+					uint8_t result = lo_val ^ hi_val;
+					out[i] ^= result;
 				}
 			}
 		}
