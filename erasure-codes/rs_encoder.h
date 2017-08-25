@@ -1,5 +1,6 @@
 
 #include <cstdint>
+#include "stream_api.h"
 
 namespace erasure
 {
@@ -14,14 +15,6 @@ namespace erasure
 	enum encoder_flags
 	{
 		DEFAULT = 0
-	};
-	enum error_code
-	{
-		// The operation completed successfully
-		SUCCESS = 0,
-		RECOVER_FAILED,
-		INVALID_ARGUMENTS,
-		INTERNAL_ERROR
 	};
 
 	rs_encoder* create_encoder(

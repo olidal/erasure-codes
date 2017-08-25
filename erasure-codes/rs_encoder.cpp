@@ -37,7 +37,7 @@ namespace erasure
 	{
 		if (!encoder || !shards || !parity)
 			return false;
-		
+
 		for (size_t i = 0; i < encoder->n_data; ++i)
 		{
 			if (!shards[i])
@@ -103,14 +103,38 @@ namespace erasure
 		delete encoder;
 	}
 
+	namespace
+	{
+		matrix build_encode_matrix(
+			rs_encoder* encoder,
+			const bool* should_encode,
+			size_t mat_sz)
+		{
+			matrix mat{
+				mat_sz,
+				encoder->n_data
+			};
+
+			for (size_t i = 0, j = 0; i < encoder->n_parity; ++i)
+			{
+				if (should_encode[i])
+				{
+					ublas::noalias(ublas::row(mat, j))
+						= ublas::row(encoder->coding_mat, i + encoder->n_data);
+
+					++j;
+				}
+			}
+		}
+	}
+
 	error_code encode_partial(
 		rs_encoder* encoder,
 		const uint8_t* const* shards,
 		uint8_t* const* parity,
 		const bool* should_encode)
 	{
-		if (!validate_args(encoder, shards, parity)
-			|| !should_encode)
+		if (!validate_args(encoder, shards, parity) || !should_encode)
 			return INVALID_ARGUMENTS;
 
 		size_t mat_sz = std::accumulate(should_encode,
@@ -119,21 +143,7 @@ namespace erasure
 		if (mat_sz == 0)
 			return SUCCESS;
 
-		matrix mat{
-			mat_sz,
-			encoder->n_data
-		};
-
-		for (size_t i = 0, j = 0; i < encoder->n_parity; ++i)
-		{
-			if (should_encode[i])
-			{
-				ublas::noalias(ublas::row(mat, j))
-					= ublas::row(encoder->coding_mat, i + encoder->n_data);
-
-				++j;
-			}
-		}
+		matrix mat = build_encode_matrix(encoder, should_encode, mat_sz);
 
 		matrix_mul(
 			mat,
@@ -183,91 +193,21 @@ namespace erasure
 		uint8_t n_present =
 			std::accumulate(
 				present,
-				present + encoder->n_data,
-				uint8_t(0));
-
-		if (n_present == encoder->n_data)
-			// All the data shards are present
-			// no need to do any more work
-			return SUCCESS;
-
-		n_present =
-			std::accumulate(
-				present + encoder->n_data,
 				present + encoder->n_shards,
-				n_present);
+				uint8_t(0));
 
 		if (n_present < encoder->n_data)
 			// Not enough shards available
 			// to recover the data
 			return RECOVER_FAILED;
 
-		uint8_t** subshards = (uint8_t**)stackalloc(
-			sizeof(uint8_t*) * encoder->n_data);
+		recover_stream* stream = create_recover_stream(encoder, present);
 
-#ifndef STACKALLOC_IS_ALLOCA
-		// Check for allocation failure
-		if (!subshards) return INTERNAL_ERROR;
-#endif
+		error_code err = stream_recover_data(stream, shards);
 
-		uint8_t** outputs = (uint8_t**)stackalloc(
-			sizeof(uint8_t*) * encoder->n_parity);
+		destroy_stream(stream);
 
-#ifndef STACKALLOC_IS_ALLOCA
-		// Check for allocation failure
-		if (!outputs) return INTERNAL_ERROR;
-#endif
-
-		matrix m = encoder->coding_mat;
-		matrix decodemat = matrix{ encoder->n_data, encoder->n_data };
-
-		// Load up the decode matrix with the rows that
-		// are still present in the input data
-		for (size_t i = 0, j = 0; i < encoder->n_shards; ++i)
-		{
-			if (present[i])
-			{
-				ublas::row(decodemat, j) = ublas::row(m, i);
-				subshards[j] = shards[i];
-				++j;
-			}
-		}
-
-		inverse(decodemat);
-
-		size_t n_outputs = 0;
-		// Grab only the rows of the decode matrix that
-		// correspond to the shards we are trying to recover
-		for (size_t i = 0, j = 0; i < encoder->n_shards; ++i)
-		{
-			if (!present[i])
-			{
-				outputs[j] = shards[i];
-				ublas::row(decodemat, j) = ublas::row(decodemat, i);
-				++j;
-			}
-			n_outputs = j;
-		}
-
-		// Get rid of the extra rows of the decode matrix
-		// since we don't need them anymore
-		decodemat = ublas::subrange(
-			decodemat,
-			0, n_outputs,
-			0, encoder->n_data);
-
-		matrix_mul(
-			decodemat,
-			subshards,
-			outputs,
-			encoder->n_data,
-			n_outputs,
-			encoder->data_size);
-
-		stackfree(subshards);
-		stackfree(outputs);
-
-		return SUCCESS;
+		return err;
 	}
 
 	error_code recover(
