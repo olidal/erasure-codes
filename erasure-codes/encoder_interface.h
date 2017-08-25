@@ -46,8 +46,21 @@ namespace erasure
 	/*
 	Preconditions:
 	Inputs 16 byte aligned.
+	num_bytes multiple of 32.
 	*/
 	void matrix_mul_sse(
+		const matrix& mat,
+		const uint8_t* const* inputs,
+		uint8_t* const* outputs,
+		size_t n_inputs,
+		size_t n_outputs,
+		size_t num_bytes);
+
+	/*
+	Preconditions:
+	num_bytes multiple of 32.
+	*/
+	void matrix_mul_avx2(
 		const matrix& mat,
 		const uint8_t* const* inputs,
 		uint8_t* const* outputs,

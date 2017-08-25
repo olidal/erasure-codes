@@ -26,6 +26,6 @@ namespace erasure
 		size_t n_outputs,
 		size_t num_bytes)
 	{
-		matrix_mul_sse(mat, inputs, outputs, n_inputs, n_outputs, num_bytes);
+		matrix_mul_avx2(mat, inputs, outputs, n_inputs, n_outputs, num_bytes);
 	}
 }
