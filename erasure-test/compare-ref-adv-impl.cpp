@@ -9,7 +9,8 @@ static constexpr size_t n = 20;
 static constexpr size_t data_size = k * 128;
 
 __declspec(align(64)) uint8_t data[data_size * k];
-__declspec(align(64)) uint8_t result[data_size * k];
+__declspec(align(64)) uint8_t result1[data_size * k];
+__declspec(align(64)) uint8_t result2[data_size * k];
 
 uint8_t* ptrs[n];
 uint8_t parity[data_size * (n - k)];
@@ -45,7 +46,7 @@ void generate_ptrs()
 	}
 }
 
-bool run_test(encoder_flags flag)
+void run_test(encoder_flags flag, void* data_ptr)
 {
 	generate_data();
 	generate_ptrs();
@@ -56,7 +57,7 @@ bool run_test(encoder_flags flag)
 
 	encode(encoder, ptrs, ptrs + k);
 
-	memcpy(result, data, sizeof(data));
+	memcpy(data_ptr, data, sizeof(data));
 
 	for (size_t i = 0; i < k; ++i)
 	{
@@ -69,26 +70,14 @@ bool run_test(encoder_flags flag)
 	recover(encoder, ptrs, present);
 
 	destroy_encoder(encoder);
-
-	if (memcmp(data, result, sizeof(data)) != 0)
-		return false;
-	return true;
 }
 
 int main()
 {
-	encoder_flags flags[] = {
-		USE_REF_IMPL,
-		USE_ADV_IMPL,
-		USE_SSSE3_IMPL,
-		USE_AVX2_IMPL
-	};
+	run_test(USE_REF_IMPL, result1);
+	run_test(USE_ADV_IMPL, result2);
 
-	for (auto flag : flags)
-	{
-		if (!run_test(flag))
-			return 1;
-	}
-
+	if (memcmp(result1, result2, sizeof(data)) != 0)
+		return 1;
 	return 0;
 }

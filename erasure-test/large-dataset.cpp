@@ -3,6 +3,7 @@
 using namespace erasure;
 
 #include <random>
+#include <cstdlib>
 
 static constexpr size_t k = 64;
 static constexpr size_t n = 80;
