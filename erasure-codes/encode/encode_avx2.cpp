@@ -1,10 +1,23 @@
 #include "encoder_interface.h"
 
-#include <intrin.h>
+#include <immintrin.h>
+#include <cstdlib>
+
+#ifdef ERASURE_NO_ALLOCA
+#	define stackalloc(size) malloc(size)
+#	define stackfree(ptr) free(ptr)
+#else
+#	define stackalloc(size) alloca(size)
+#	define stackfree(ptr);
+// Use this to disable returned pointer checks
+// for alloca since it should never be null in
+// cases other than n_data == n_shards
+#	define STACKALLOC_IS_ALLOCA
+#endif
 
 namespace erasure
 {
-	namespace
+	namespace avx2
 	{
 		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes)
 		{
@@ -72,16 +85,21 @@ namespace erasure
 		}
 	}
 
+	namespace 
+	{
+		constexpr size_t round_mask = ~(sizeof(__m256i) - 1);
+	}
+
 	void matrix_mul_avx2(
 		const matrix& mat,
 		const uint8_t* const* inputs,
 		uint8_t* const* outputs,
-		size_t n_inputs,
-		size_t n_outputs,
-		size_t num_bytes)
+		const size_t n_inputs,
+		const size_t n_outputs,
+		const size_t num_bytes)
 	{
 		assert(num_bytes % 32 == 0);
-				
+
 		for (size_t r = 0; r < n_outputs; ++r)
 		{
 			uint8_t* out = outputs[r];
@@ -91,12 +109,31 @@ namespace erasure
 				const uint8_t* in = inputs[c];
 
 				if (c == 0)
-					mul_row(mat(r, c).value, in, out, num_bytes);
+					avx2::mul_row(mat(r, c).value, in, out, num_bytes & round_mask);
 				else
-					mul_add_row(mat(r, c).value, in, out, num_bytes);
+					avx2::mul_add_row(mat(r, c).value, in, out, num_bytes & round_mask);
 			}
 		}
 
 		_mm256_zeroupper();
+
+		if ((num_bytes & ~round_mask) != 0)
+		{
+			for (size_t r = 0; r < n_outputs; ++r)
+			{
+				uint8_t* out = outputs[r] + (num_bytes & round_mask);
+
+				for (size_t c = 0; c < n_outputs; ++r)
+				{
+					const uint8_t* in = inputs[c] + (num_bytes & round_mask);
+					const auto val = mat(r, c).value;
+
+					if (c == 0)
+						adv::mul_row(mat(r, c).value, in, out, num_bytes & ~round_mask);
+					else
+						adv::mul_add_row(mat(r, c).value, in, out, num_bytes & ~round_mask);
+				}
+			}
+		}
 	}
 }

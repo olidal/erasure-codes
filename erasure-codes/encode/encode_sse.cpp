@@ -4,16 +4,12 @@
 
 namespace erasure
 {
-#ifdef _MSC_VER
-#	define restrict __restrict
-#endif
-
-	namespace 
+	namespace ssse3
 	{
 		void mul_add_row(
 			uint8_t val, 
-			const uint8_t* restrict in, 
-			uint8_t* restrict out, 
+			const uint8_t* in, 
+			uint8_t* out, 
 			size_t num_bytes)
 		{
 			const __m128i mask = _mm_set1_epi8(0x0F);
@@ -43,8 +39,8 @@ namespace erasure
 		}
 		void mul_row(
 			uint8_t val, 
-			const uint8_t* restrict in, 
-			uint8_t* restrict out,
+			const uint8_t* in, 
+			uint8_t* out,
 			size_t num_bytes)
 		{
 			const __m128i mask = _mm_set1_epi8(0x0F);
@@ -73,6 +69,11 @@ namespace erasure
 		}
 	}
 
+	namespace
+	{
+		constexpr size_t round_mask = ~(sizeof(__m128i) - 1);
+	}
+
 	void matrix_mul_sse(
 		const matrix& mat,
 		const uint8_t* const* inputs,
@@ -81,23 +82,37 @@ namespace erasure
 		size_t n_outputs,
 		size_t num_bytes)
 	{
-		assert(num_bytes % 16 == 0);
-		
 		for (size_t r = 0; r < n_outputs; ++r)
 		{
-			// Must be 16-byte aligned
 			uint8_t* out = outputs[r];
-			
+
 			for (size_t c = 0; c < n_inputs; ++c)
 			{
-				// Must be 16-byte aligned
 				const uint8_t* in = inputs[c];
-				const uint8_t val = mat(r, c).value;
 
 				if (c == 0)
-					mul_row(val, in, out, num_bytes);
+					ssse3::mul_row(mat(r, c).value, in, out, num_bytes & round_mask);
 				else
-					mul_add_row(val, in, out, num_bytes);
+					ssse3::mul_add_row(mat(r, c).value, in, out, num_bytes & round_mask);
+			}
+		}
+
+		if ((num_bytes & ~round_mask) != 0)
+		{
+			for (size_t r = 0; r < n_outputs; ++r)
+			{
+				uint8_t* out = outputs[r] + (num_bytes & round_mask);
+
+				for (size_t c = 0; c < n_outputs; ++r)
+				{
+					const uint8_t* in = inputs[c] + (num_bytes & round_mask);
+					const auto val = mat(r, c).value;
+
+					if (c == 0)
+						adv::mul_row(mat(r, c).value, in, out, num_bytes & ~round_mask);
+					else
+						adv::mul_add_row(mat(r, c).value, in, out, num_bytes & ~round_mask);
+				}
 			}
 		}
 	}

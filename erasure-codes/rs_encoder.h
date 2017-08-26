@@ -30,6 +30,7 @@ namespace erasure
 		rs_encoder* encoder,
 		const uint8_t* const* shards,
 		uint8_t* const* parity);
+
 	/* Encodes a subset of the parity shards given
 	   the data shards. Unused parity shard pointers
 	   are not accessed and may be null.
