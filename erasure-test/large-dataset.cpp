@@ -6,7 +6,7 @@ using namespace erasure;
 
 static constexpr size_t k = 64;
 static constexpr size_t n = 80;
-static constexpr size_t data_size = 1024 * 1024 * 16;
+static constexpr size_t data_size = 1024 * 1024;
 
 uint8_t* ptrs[n];
 bool present[n];
