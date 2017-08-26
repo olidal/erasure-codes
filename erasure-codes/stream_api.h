@@ -31,7 +31,4 @@ namespace erasure
 	error_code stream_recover_data(
 		recover_stream* stream,
 		uint8_t* const* shards);
-	error_code stream_recover(
-		recover_stream* stream,
-		uint8_t* const* shards);
 }

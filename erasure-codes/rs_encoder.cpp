@@ -102,34 +102,7 @@ namespace erasure
 	{
 		delete encoder;
 	}
-
-	namespace
-	{
-		matrix build_encode_matrix(
-			rs_encoder* encoder,
-			const bool* should_encode,
-			size_t mat_sz)
-		{
-			matrix mat{
-				mat_sz,
-				encoder->n_data
-			};
-
-			for (size_t i = 0, j = 0; i < encoder->n_parity; ++i)
-			{
-				if (should_encode[i])
-				{
-					ublas::noalias(ublas::row(mat, j))
-						= ublas::row(encoder->coding_mat, i + encoder->n_data);
-
-					++j;
-				}
-			}
-
-			return mat;
-		}
-	}
-
+	
 	error_code encode_partial(
 		rs_encoder* encoder,
 		const uint8_t* const* shards,
@@ -139,23 +112,16 @@ namespace erasure
 		if (!validate_args(encoder, shards, parity) || !should_encode)
 			return INVALID_ARGUMENTS;
 
-		size_t mat_sz = std::accumulate(should_encode,
-			should_encode + encoder->n_parity, 0);
+		encode_stream* stream = create_encode_stream(encoder, should_encode);
 
-		if (mat_sz == 0)
-			return SUCCESS;
+		if (!stream)
+			return INTERNAL_ERROR;
 
-		matrix mat = build_encode_matrix(encoder, should_encode, mat_sz);
+		error_code err = stream_encode(stream, shards, parity);
 
-		matrix_mul(
-			mat,
-			shards,
-			parity,
-			encoder->n_data,
-			encoder->n_parity,
-			encoder->data_size);
+		destroy_stream(stream);
 
-		return SUCCESS;
+		return err;
 	}
 
 	error_code encode(
@@ -205,6 +171,9 @@ namespace erasure
 
 		recover_stream* stream = create_recover_stream(encoder, present);
 
+		if (!stream)
+			return INTERNAL_ERROR;
+
 		error_code err = stream_recover_data(stream, shards);
 
 		destroy_stream(stream);
@@ -239,7 +208,7 @@ namespace erasure
 			encoder,
 			shards,
 			shards + encoder->n_data,
-			present + encoder->n_data);
+			should_encode);
 
 		stackfree(should_encode);
 

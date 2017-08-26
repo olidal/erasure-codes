@@ -146,7 +146,7 @@ namespace erasure
 		
 #ifndef STACKALLOC_IS_ALLOCA
 		// Check for allocation failure
-		if (!inputs) return INTERNAL_ERROR;
+		if (!outputs) return INTERNAL_ERROR;
 #endif
 
 		for (size_t i = 0; i < stream->n_inputs; ++i)
