@@ -125,6 +125,8 @@ namespace erasure
 					++j;
 				}
 			}
+
+			return mat;
 		}
 	}
 
