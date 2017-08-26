@@ -1,6 +1,5 @@
 #include "stream_api.h"
-#include "encoder_interface.h"
-#include "rs_encoder_internal.h"
+#include "encoder_internal.h"
 
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 

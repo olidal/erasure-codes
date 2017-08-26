@@ -84,8 +84,6 @@ namespace erasure
 		const size_t n_outputs,
 		const size_t num_bytes)
 	{
-		assert(num_bytes % 32 == 0);
-
 		for (size_t r = 0; r < n_outputs; ++r)
 		{
 			uint8_t* out = outputs[r];
