@@ -1,4 +1,4 @@
-#include "encoder_interface.h"
+#include "encoder_internal.h"
 
 #include <tmmintrin.h>
 

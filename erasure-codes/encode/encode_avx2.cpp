@@ -1,19 +1,6 @@
-#include "encoder_interface.h"
+#include "encoder_internal.h"
 
 #include <immintrin.h>
-#include <cstdlib>
-
-#ifdef ERASURE_NO_ALLOCA
-#	define stackalloc(size) malloc(size)
-#	define stackfree(ptr) free(ptr)
-#else
-#	define stackalloc(size) alloca(size)
-#	define stackfree(ptr);
-// Use this to disable returned pointer checks
-// for alloca since it should never be null in
-// cases other than n_data == n_shards
-#	define STACKALLOC_IS_ALLOCA
-#endif
 
 namespace erasure
 {
@@ -24,14 +11,13 @@ namespace erasure
 			const __m256i mask = _mm256_set1_epi8(0x0F);
 			// Load the entire lookup table into the lo register
 			__m256i lo = _mm256_load_si256((const __m256i*)lohi_table[val][0]);
-			// Move the hi part of the table into it's own register
-			// and duplicate it across the hi and lo halfs of the register
+			// Move the hi part of the table into it's own register and
+			// duplicate it across the hi and lo halves of the register
 			__m256i hi = _mm256_permute2f128_si256(lo, lo, 0b0010001);
 
 			// Duplicate lower half of lo across the whole register
 			lo = _mm256_permute2f128_si256(lo, lo, 0);
-
-
+			
 			for (size_t i = 0; i < num_bytes; i += sizeof(__m256i))
 			{
 				// in_val = in[i]
