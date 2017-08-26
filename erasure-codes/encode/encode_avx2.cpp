@@ -107,7 +107,7 @@ namespace erasure
 			{
 				uint8_t* out = outputs[r] + (num_bytes & round_mask);
 
-				for (size_t c = 0; c < n_outputs; ++r)
+				for (size_t c = 0; c < n_outputs; ++c)
 				{
 					const uint8_t* in = inputs[c] + (num_bytes & round_mask);
 					const auto val = mat(r, c).value;

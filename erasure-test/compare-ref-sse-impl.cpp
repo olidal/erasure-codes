@@ -8,9 +8,9 @@ static constexpr size_t k = 16;
 static constexpr size_t n = 20;
 static constexpr size_t data_size = k * 128;
 
-__declspec(align(64)) uint8_t data[data_size * k];
-__declspec(align(64)) uint8_t result1[data_size * k];
-__declspec(align(64)) uint8_t result2[data_size * k];
+alignas(64) uint8_t data[data_size * k];
+alignas(64) uint8_t result1[data_size * k];
+alignas(64) uint8_t result2[data_size * k];
 
 uint8_t* ptrs[n];
 uint8_t parity[data_size * (n - k)];
@@ -53,7 +53,7 @@ void run_test(encoder_flags flag, void* data_ptr)
 
 	encode_parameters params = { n, k, data_size };
 
-	rs_encoder* encoder = create_encoder(params);
+	rs_encoder* encoder = create_encoder(params, flag);
 
 	encode(encoder, ptrs, ptrs + k);
 

@@ -48,7 +48,7 @@ bool run_test(encoder_flags flag)
 
 	encode_parameters params = { n, k, data_size };
 
-	rs_encoder* encoder = create_encoder(params);
+	rs_encoder* encoder = create_encoder(params, flag);
 
 	encode(encoder, ptrs, ptrs + k);
 
