@@ -1,5 +1,6 @@
 #include "rs_encoder.h"
 #include "encoder_interface.h"
+#include "rs_encoder_internal.h"
 
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
@@ -20,16 +21,7 @@ namespace erasure
 #endif
 
 	using namespace boost::numeric;
-
-	struct rs_encoder
-	{
-		matrix coding_mat;
-		size_t data_size;
-		uint8_t n_data;
-		uint8_t n_shards;
-		uint8_t n_parity;
-	};
-
+	
 	bool validate_args(
 		rs_encoder* encoder,
 		const uint8_t* const* shards,
@@ -94,6 +86,25 @@ namespace erasure
 		encoder->n_shards = params.n;
 		encoder->n_parity = params.n - params.k;
 		encoder->data_size = params.data_size;
+
+		switch (flags)
+		{
+		case USE_REF_IMPL:
+			encoder->mul_proc = matrix_mul_basic;
+			break;
+		case USE_ADV_IMPL:
+			encoder->mul_proc = matrix_mul_adv;
+			break;
+		case USE_SSSE3_IMPL:
+			encoder->mul_proc = matrix_mul_sse;
+			break;
+		case USE_AVX2_IMPL:
+			encoder->mul_proc = matrix_mul_avx2;
+			break;
+		default:
+			encoder->mul_proc = matrix_mul;
+			break;
+		}
 
 		return encoder;
 	}

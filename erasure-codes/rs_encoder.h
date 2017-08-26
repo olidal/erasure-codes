@@ -14,7 +14,11 @@ namespace erasure
 
 	enum encoder_flags
 	{
-		DEFAULT = 0
+		DEFAULT = 0,
+		USE_REF_IMPL   = 1,
+		USE_ADV_IMPL   = 2,
+		USE_SSSE3_IMPL = 3,
+		USE_AVX2_IMPL  = 4,
 	};
 
 	rs_encoder* create_encoder(

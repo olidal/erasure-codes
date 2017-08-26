@@ -67,4 +67,12 @@ namespace erasure
 		size_t n_inputs,
 		size_t n_outputs,
 		size_t num_bytes);
+
+	typedef void(*matrix_mul_proc)(
+		const matrix& mat,
+		const uint8_t* const* inputs,
+		uint8_t* const* outputs,
+		size_t n_inputs,
+		size_t n_outputs,
+		size_t num_bytes);
 }

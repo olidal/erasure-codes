@@ -1,5 +1,6 @@
 #include "stream_api.h"
 #include "encoder_interface.h"
+#include "rs_encoder_internal.h"
 
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
@@ -20,22 +21,14 @@ namespace erasure
 #endif
 
 	namespace ublas = boost::numeric::ublas;
-
-	struct rs_encoder
-	{
-		matrix coding_mat;
-		size_t data_size;
-		uint8_t n_data;
-		uint8_t n_shards;
-		uint8_t n_parity;
-	};
-
+	
 	struct recover_stream
 	{
 		matrix decode;
 		uint8_t* in_indices;
 		uint8_t* out_indices;
 		void* buffer; // buffer for in_indices and out_indices
+		matrix_mul_proc mul_proc;
 		size_t data_size;
 		uint8_t n_inputs;
 		uint8_t n_outputs;
@@ -109,6 +102,7 @@ namespace erasure
 			inputs,
 			outputs,
 			buffer,
+			encoder->mul_proc,
 			encoder->data_size,
 			n_inputs,
 			n_outputs,
@@ -154,7 +148,7 @@ namespace erasure
 		for (size_t i = 0; i < stream->n_outputs; ++i)
 			outputs[i] = shards[stream->out_indices[i]];
 
-		matrix_mul(
+		stream->mul_proc(
 			stream->decode,
 			inputs,
 			outputs,
