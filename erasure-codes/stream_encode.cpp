@@ -49,8 +49,7 @@ namespace erasure
 		{
 			if (should_encode[i])
 			{
-				ublas::noalias(ublas::row(mat, j)) =
-					ublas::row(encoder->coding_mat, i + encoder->n_data);
+				mat[j] = encoder->coding_mat[i + encoder->n_data];
 
 				outputs[j] = (uint8_t)i;
 				++j;

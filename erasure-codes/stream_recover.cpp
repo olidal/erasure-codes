@@ -72,7 +72,7 @@ namespace erasure
 		{
 			if (present[i])
 			{
-				ublas::row(decode, n_inputs) = ublas::row(m, i);
+				decode.row(n_inputs) = m.row(i);
 				inputs[n_inputs] = i;
 				++n_inputs;
 			}
@@ -86,13 +86,12 @@ namespace erasure
 			if (!present[i])
 			{
 				outputs[n_outputs] = i;
-				ublas::row(decode, n_outputs) = ublas::row(decode, i);
+				decode.row(n_outputs) = decode.row(i);
 				++n_outputs;
 			}
 		}
 
-		decode = ublas::subrange(
-			decode,
+		decode = decode.submatrix(
 			0, n_outputs,
 			0, encoder->n_data);
 

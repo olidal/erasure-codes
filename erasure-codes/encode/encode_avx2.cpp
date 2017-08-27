@@ -113,7 +113,6 @@ namespace erasure
 				for (size_t c = 0; c < n_inputs; ++c)
 				{
 					const uint8_t* in = inputs[c] + completed;
-					const auto val = mat(r, c).value;
 
 					if (c == 0)
 						adv::mul_row(mat(r, c).value, in, out, remainder);

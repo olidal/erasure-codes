@@ -1,4 +1,12 @@
 
+// Disable debug checks in ublas
+// our type doesn't suffer from 
+// precision issues anyway
+#define BOOST_UBLAS_NDEBUG
+// Disable exceptions in boost
+// ublas methods
+#define BOOST_NO_EXCEPTIONS
+
 #ifdef _MSC_VER
 #	pragma warning(disable:4267 4996)
 #endif
@@ -12,23 +20,27 @@ namespace erasure
 {
 	using boost::numeric::ublas::permutation_matrix;
 	using boost::numeric::ublas::identity_matrix;
+	typedef boost::numeric::ublas::matrix<symbol> blas_matrix;
 
 	using namespace boost::numeric;
 
-	bool inverse(matrix& mat)
+	bool inverse(matrix& m)
 	{
-		assert(mat.size1() == mat.size2());
+		assert(m.size1() == m.size2());
+
+		blas_matrix mat = blas_matrix{ m.size1(), m.size2() };
+		std::copy(m.data(), m.data() + m.size(), mat.data().begin());
 
 		permutation_matrix<uint8_t> pm(mat.size1());
 
 		if (ublas::lu_factorize(mat, pm) != 0)
 			return false;
 
-		matrix inverse = identity_matrix<symbol>(mat.size1());
+		blas_matrix inverse = identity_matrix<symbol>(mat.size1());
 
 		ublas::lu_substitute(mat, pm, inverse);
 
-		mat.assign(inverse);
+		std::copy(inverse.data().begin(), inverse.data().end(), m.data());
 
 		return true;
 	}
@@ -50,11 +62,11 @@ namespace erasure
 	matrix build_matrix(size_t n, size_t k)
 	{
 		auto vm = vandermonde(n, k);
-		matrix inv = ublas::subrange(vm, 0, k, 0, k);
+		matrix inv = vm.submatrix(0, k, 0, k);
 
 		auto r = inverse(inv);
 		assert(r); // Matrix should never be singular
 
-		return ublas::prod(vm, inv);
+		return vm * inv;
 	}
 }
