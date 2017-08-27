@@ -68,7 +68,7 @@ namespace erasure
 		uint8_t* outputs = (uint8_t*)buffer + encoder->n_data;
 
 		uint8_t n_inputs = 0;
-		for (uint8_t i = 0; i < encoder->n_shards, n_inputs < encoder->n_data; ++i)
+		for (uint8_t i = 0; i < encoder->n_shards && n_inputs < encoder->n_data; ++i)
 		{
 			if (present[i])
 			{
@@ -81,7 +81,7 @@ namespace erasure
 		inverse(decode);
 
 		uint8_t n_outputs = 0;
-		for (uint8_t i = 0; i < encoder->n_shards; ++i)
+		for (uint8_t i = 0; i < encoder->n_data; ++i)
 		{
 			if (!present[i])
 			{

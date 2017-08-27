@@ -1,7 +1,7 @@
 
-static constexpr size_t k = 16;
-static constexpr size_t n = 20;
-static constexpr size_t data_size = k * 128;
+static constexpr size_t k = 2;
+static constexpr size_t n = 3;
+static constexpr size_t data_size = 32;
 
 #include "recover-template.hpp"
 

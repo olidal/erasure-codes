@@ -45,7 +45,7 @@ namespace erasure
 		matrix mat{ mat_sz, encoder->n_data };
 
 		uint8_t* outputs = new uint8_t[mat_sz];
-		for (size_t i = 0, j = 0; i < encoder->n_parity, j < mat_sz; ++i)
+		for (size_t i = 0, j = 0; i < encoder->n_parity && j < mat_sz; ++i)
 		{
 			if (should_encode[i])
 			{

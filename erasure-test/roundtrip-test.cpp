@@ -22,7 +22,7 @@ void generate_data(unsigned seed = 5489u)
 
 	for (size_t i = 0; i < sizeof(data) / sizeof(uint8_t); ++i)
 	{
-		data[i] = dist(eng);
+		data[i] = 0xAA;// dist(eng);
 	}
 }
 
