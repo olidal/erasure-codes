@@ -56,9 +56,6 @@ namespace erasure
 		if (n_present < encoder->n_data)
 			return nullptr;
 
-		matrix m = encoder->coding_mat;
-		matrix decode = matrix{ encoder->n_data, encoder->n_data };
-
 		void* buffer = malloc(sizeof(uint8_t) * encoder->n_shards);
 		
 		if (!buffer)
@@ -66,6 +63,9 @@ namespace erasure
 
 		uint8_t* inputs = (uint8_t*)buffer;
 		uint8_t* outputs = (uint8_t*)buffer + encoder->n_data;
+
+		matrix m = encoder->coding_mat;
+		matrix decode = matrix{ encoder->n_data, encoder->n_data };
 
 		uint8_t n_inputs = 0;
 		for (uint8_t i = 0; i < encoder->n_shards && n_inputs < encoder->n_data; ++i)

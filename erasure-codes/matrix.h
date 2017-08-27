@@ -225,7 +225,7 @@ namespace erasure
 		matrix submatrix(size_t r1, size_t r2, size_t c1, size_t c2) const
 		{
 			assert(r1 <= r2 && r2 <= rows);
-			assert(c1 <= c2 && c2 <= rows);
+			assert(c1 <= c2 && c2 <= cols);
 
 			matrix m(r2 - r1, c2 - c1);
 
@@ -249,7 +249,7 @@ namespace erasure
 
 		matrix result(lhs.size1(), rhs.size2());
 
-		for (size_t i = 0; i < lhs.size2(); ++i)
+		for (size_t i = 0; i < lhs.size1(); ++i)
 		{
 			for (size_t j = 0; j < rhs.size2(); ++j)
 			{
