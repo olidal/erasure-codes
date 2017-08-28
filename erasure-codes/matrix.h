@@ -1,6 +1,7 @@
 #pragma once
 
 #include "symbol.h"
+#include "export_defs.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -114,6 +115,24 @@ namespace erasure
 		{
 			if (datasize() != 0)
 				values = (symbol*)std::malloc(datasize());
+		}
+		matrix(size_t rows, size_t cols, symbol diag) :
+			rows(rows),
+			cols(cols),
+			values(nullptr)
+		{
+			if (datasize() != 0)
+				values = (symbol*)std::calloc(1, datasize());
+
+			if (values != nullptr)
+			{
+				size_t mindim = rows < cols ? rows : cols;
+
+				for (size_t i = 0; i < mindim; ++i)
+				{
+					(*this)(i, i) = diag;
+				}
+			}
 		}
 
 		~matrix()

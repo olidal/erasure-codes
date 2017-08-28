@@ -1,6 +1,8 @@
 #ifndef ERASURE_ENCODER_INTERNAL_H
 #define ERASURE_ENCODER_INTERNAL_H
 
+#include "liberasure.h"
+
 #include <cstdint>
 #include "matrix.h"
 
@@ -13,7 +15,7 @@ namespace erasure
 		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
 		void mul_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
 	}
-	
+
 	namespace ssse3
 	{
 		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
@@ -48,7 +50,7 @@ namespace erasure
 		size_t n_inputs,
 		size_t n_outputs,
 		size_t num_bytes);
-	
+
 	/*
 	Preconditions:
 	   No alignment or size restrictions.
@@ -92,16 +94,18 @@ namespace erasure
 		size_t n_inputs,
 		size_t n_outputs,
 		size_t num_bytes);
-	
-	struct rs_encoder
-	{
-		matrix coding_mat;
-		size_t data_size;
-		matrix_mul_proc mul_proc;
-		uint8_t n_data;
-		uint8_t n_shards;
-		uint8_t n_parity;
-	};
+
+	typedef erasure_encoder_ rs_encoder;
 }
+
+struct erasure_encoder_
+{
+	erasure::matrix coding_mat;
+	size_t data_size;
+	erasure::matrix_mul_proc mul_proc;
+	uint8_t n_data;
+	uint8_t n_shards;
+	uint8_t n_parity;
+};
 
 #endif

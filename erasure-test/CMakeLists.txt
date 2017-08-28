@@ -11,7 +11,7 @@ foreach(src_file ${sources})
 
 	add_dependencies(${test_name} erasure)
 
-	set_target_properties(${test_name} PROPERTIES FOLDER Test)
+	set_target_properties(${test_name} PROPERTIES FOLDER Tests)
 
 	target_include_directories(${test_name} PRIVATE ../erasure-codes)
 	target_link_libraries(${test_name} PRIVATE erasure)

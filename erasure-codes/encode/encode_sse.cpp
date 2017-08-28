@@ -72,6 +72,12 @@ namespace erasure
 	namespace
 	{
 		constexpr size_t round_mask = ~(sizeof(__m128i) - 1);
+
+		bool is_aligned(const uint8_t* ptr)
+		{
+			return ((std::uintptr_t)ptr & ~round_mask) == 0;
+		}
+
 	}
 
 	void matrix_mul_sse(
@@ -86,9 +92,13 @@ namespace erasure
 		{
 			uint8_t* out = outputs[r];
 
+			assert(is_aligned(out));
+
 			for (size_t c = 0; c < n_inputs; ++c)
 			{
 				const uint8_t* in = inputs[c];
+
+				assert(is_aligned(in));
 
 				if (c == 0)
 					ssse3::mul_row(mat(r, c).value, in, out, num_bytes & round_mask);

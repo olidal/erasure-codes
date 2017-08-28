@@ -8,7 +8,7 @@ alignas(64) uint8_t data[data_size * k];
 alignas(64) uint8_t result[data_size * k];
 
 uint8_t* ptrs[n];
-uint8_t parity[data_size * (n - k)];
+alignas(64) uint8_t parity[data_size * (n - k)];
 bool present[n];
 
 // Default value from mt19937 argument default value

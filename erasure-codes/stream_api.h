@@ -1,10 +1,11 @@
-#include <cstdint>
+#include "liberasure.h"
 
 namespace erasure
 {
-	struct rs_encoder;
 	struct recover_stream;
 	struct encode_stream;
+
+	typedef erasure_encoder_ rs_encoder;
 
 	enum error_code
 	{

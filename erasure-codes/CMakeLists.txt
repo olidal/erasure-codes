@@ -29,8 +29,10 @@ elseif(FLAG_TYPE STREQUAL "Windows")
 		set_source_files_properties(encode/encode_avx2.cpp PROPERTIES COMPILE_FLAGS " /arch:avx2")
 	endif()
 else()
-	message(WARNING "Unknown compiler detected! Flags will not be passed for specific files.")
+	message(WARNING "Unknown compiler! Flags will not be passed for specific files.")
 endif()
+
+add_definitions(-DERASURE_BUILD)
 
 add_library(erasure ${sources})
 

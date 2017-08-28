@@ -1,5 +1,4 @@
 
-#include <cstdint>
 #include "stream_api.h"
 
 namespace erasure
@@ -10,8 +9,7 @@ namespace erasure
 		uint8_t k; // Number of data shards
 		size_t data_size; // Size of each shard (in bytes)
 	};
-	struct rs_encoder;
-
+	
 	enum encoder_flags
 	{
 		DEFAULT = 0,
