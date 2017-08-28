@@ -5,6 +5,19 @@
 
 #include <numeric>
 
+struct erasure_recover_stream_
+{
+	erasure::matrix decode;
+	uint8_t* in_indices;
+	uint8_t* out_indices;
+	void* buffer; // buffer for in_indices and out_indices
+	erasure::matrix_mul_proc mul_proc;
+	size_t data_size;
+	uint8_t n_inputs;
+	uint8_t n_outputs;
+	uint8_t n_shards;
+};
+
 namespace erasure
 {
 #ifdef ERASURE_NO_ALLOCA
@@ -20,19 +33,6 @@ namespace erasure
 #endif
 
 	namespace ublas = boost::numeric::ublas;
-	
-	struct recover_stream
-	{
-		matrix decode;
-		uint8_t* in_indices;
-		uint8_t* out_indices;
-		void* buffer; // buffer for in_indices and out_indices
-		matrix_mul_proc mul_proc;
-		size_t data_size;
-		uint8_t n_inputs;
-		uint8_t n_outputs;
-		uint8_t n_shards;
-	};
 
 	recover_stream* create_recover_stream(
 		rs_encoder* encoder,
@@ -57,7 +57,7 @@ namespace erasure
 			return nullptr;
 
 		void* buffer = malloc(sizeof(uint8_t) * encoder->n_shards);
-		
+
 		if (!buffer)
 			return nullptr;
 
@@ -133,9 +133,9 @@ namespace erasure
 		// Check for allocation failure
 		if (!inputs) return INTERNAL_ERROR;
 #endif
-		
+
 		uint8_t** outputs = (uint8_t**)stackalloc(sizeof(uint8_t*) * stream->n_outputs);
-		
+
 #ifndef STACKALLOC_IS_ALLOCA
 		// Check for allocation failure
 		if (!outputs) return INTERNAL_ERROR;

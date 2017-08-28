@@ -5,6 +5,17 @@
 
 #include <numeric>
 
+struct erasure_encode_stream_
+{
+	erasure::matrix mat;
+	uint8_t* indices;
+	erasure::matrix_mul_proc mul_proc;
+	size_t data_size;
+	uint8_t n_data;
+	uint8_t n_outputs;
+	uint8_t n_parity;
+};
+
 namespace erasure
 {
 #ifdef ERASURE_NO_ALLOCA
@@ -21,16 +32,6 @@ namespace erasure
 
 	namespace ublas = boost::numeric::ublas;
 
-	struct encode_stream
-	{
-		matrix mat;
-		uint8_t* indices;
-		matrix_mul_proc mul_proc;
-		size_t data_size;
-		uint8_t n_data;
-		uint8_t n_outputs;
-		uint8_t n_parity;
-	};
 
 	encode_stream* create_encode_stream(
 		rs_encoder* encoder,

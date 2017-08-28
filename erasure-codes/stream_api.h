@@ -2,10 +2,9 @@
 
 namespace erasure
 {
-	struct recover_stream;
-	struct encode_stream;
-
 	typedef erasure_encoder_ rs_encoder;
+	typedef erasure_encode_stream_ encode_stream;
+	typedef erasure_recover_stream_ recover_stream;
 
 	enum error_code
 	{

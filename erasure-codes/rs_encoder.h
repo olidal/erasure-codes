@@ -3,12 +3,8 @@
 
 namespace erasure
 {
-	struct encode_parameters
-	{
-		uint8_t n; // Total number of shards
-		uint8_t k; // Number of data shards
-		size_t data_size; // Size of each shard (in bytes)
-	};
+
+	typedef erasure_encoder_parameters encode_parameters;
 	
 	enum encoder_flags
 	{

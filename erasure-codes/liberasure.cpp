@@ -16,10 +16,9 @@ extern "C" erasure_encoder erasure_create_encoder(
 		if (params->k >= params->n)
 			return nullptr;
 
-		return reinterpret_cast<erasure_encoder>(
-			erasure::create_encoder(
-				*(const erasure::encode_parameters*)params,
-				(erasure::encoder_flags)flags));
+		return erasure::create_encoder(
+				*params,
+				(erasure::encoder_flags)flags);
 	} 
 	catch (...)
 	{
@@ -30,7 +29,7 @@ extern "C" void erasure_destroy_encoder(erasure_encoder encoder)
 {
 	try
 	{
-		erasure::destroy_encoder((erasure::rs_encoder*)encoder);
+		erasure::destroy_encoder(encoder);
 	}
 	catch (...)
 	{
@@ -49,7 +48,7 @@ extern "C" enum erasure_error_code erasure_encode(
 	try
 	{
 		return (erasure_error_code)erasure::encode(
-			(erasure::rs_encoder*)encoder,
+			encoder,
 			shards,
 			parity);
 	}
@@ -71,7 +70,7 @@ extern "C" enum erasure_error_code erasure_encode_partial(
 	try
 	{
 		return (erasure_error_code)erasure::encode_partial(
-			(erasure::rs_encoder*)encoder,
+			encoder,
 			shards,
 			parity,
 			(const bool*)present);
@@ -93,7 +92,7 @@ extern "C" enum erasure_error_code erasure_recover_data(
 	try
 	{
 		return (erasure_error_code)erasure::recover_data(
-			(erasure::rs_encoder*)encoder,
+			encoder,
 			shards,
 			(const bool*)present);
 	}
@@ -114,7 +113,7 @@ extern "C" enum erasure_error_code erasure_recover(
 	try
 	{
 		return (erasure_error_code)erasure::recover(
-			(erasure::rs_encoder*)encoder,
+			encoder,
 			shards,
 			(const bool*)present);
 	}
