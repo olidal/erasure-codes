@@ -20,44 +20,6 @@ namespace erasure
 #endif
 
 	using namespace boost::numeric;
-	
-	bool validate_args(
-		rs_encoder* encoder,
-		const uint8_t* const* shards,
-		const uint8_t* const* parity)
-	{
-		if (!encoder || !shards || !parity)
-			return false;
-
-		for (size_t i = 0; i < encoder->n_data; ++i)
-		{
-			if (!shards[i])
-				return false;
-		}
-
-		for (size_t i = 0; i < encoder->n_parity; ++i)
-		{
-			if (!parity[i])
-				return false;
-		}
-
-		return true;
-	}
-	bool validate_args(
-		rs_encoder* encoder,
-		const uint8_t* const* shards)
-	{
-		if (!encoder || !shards)
-			return false;
-
-		for (size_t i = 0; i < encoder->n_shards; ++i)
-		{
-			if (!shards[i])
-				return false;
-		}
-
-		return true;
-	}
 
 	rs_encoder* create_encoder(
 		const encode_parameters& params,
@@ -88,16 +50,16 @@ namespace erasure
 
 		switch (flags)
 		{
-		case USE_REF_IMPL:
+		case ERASURE_FORCE_REF_IMPL:
 			encoder->mul_proc = matrix_mul_basic;
 			break;
-		case USE_ADV_IMPL:
+		case ERASURE_FORCE_ADV_IMPL:
 			encoder->mul_proc = matrix_mul_adv;
 			break;
-		case USE_SSSE3_IMPL:
+		case ERASURE_FORCE_SSSE3_IMPL:
 			encoder->mul_proc = matrix_mul_sse;
 			break;
-		case USE_AVX2_IMPL:
+		case ERASURE_FORCE_AVX2_IMPL:
 			encoder->mul_proc = matrix_mul_avx2;
 			break;
 		default:
@@ -119,9 +81,6 @@ namespace erasure
 		uint8_t* const* parity,
 		const bool* should_encode)
 	{
-		if (!validate_args(encoder, shards, parity) || !should_encode)
-			return INVALID_ARGUMENTS;
-
 		encode_stream* stream = create_encode_stream(encoder, should_encode);
 
 		if (!stream)
@@ -165,9 +124,6 @@ namespace erasure
 		uint8_t* const* shards,
 		const bool* present)
 	{
-		if (!validate_args(encoder, shards) || !present)
-			return INVALID_ARGUMENTS;
-
 		uint8_t n_present =
 			std::accumulate(
 				present,

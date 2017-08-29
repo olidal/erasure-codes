@@ -5,19 +5,19 @@ namespace erasure
 {
 
 	typedef erasure_encoder_parameters encode_parameters;
+	typedef erasure_encoder_flags encoder_flags;
 	
-	enum encoder_flags
-	{
-		DEFAULT = 0,
-		USE_REF_IMPL   = 1,
-		USE_ADV_IMPL   = 2,
-		USE_SSSE3_IMPL = 3,
-		USE_AVX2_IMPL  = 4,
-	};
+	static constexpr auto DEFAULT = ERASURE_DEFAULT;
+	static constexpr auto USE_REF_IMPL = ERASURE_FORCE_REF_IMPL;
+	static constexpr auto USE_ADV_IMPL = ERASURE_FORCE_ADV_IMPL;
+#if defined ERASURE_ARCH_I386 || defined ERASURE_ARCH_X86_64
+	static constexpr auto USE_SSSE3_IMPL = ERASURE_FORCE_SSSE3_IMPL;
+	static constexpr auto USE_AVX2_IMPL = ERASURE_FORCE_AVX2_IMPL;
+#endif
 
 	rs_encoder* create_encoder(
 		const encode_parameters& params,
-		encoder_flags flags = DEFAULT);
+		encoder_flags flags = ERASURE_DEFAULT);
 	void destroy_encoder(rs_encoder* encoder);
 
 	error_code encode(

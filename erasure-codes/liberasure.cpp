@@ -1,6 +1,18 @@
 #include "liberasure.h"
 
+#include "encoder_internal.h"
 #include "rs_encoder.h"
+
+bool validate(const uint8_t* const* ptrs, size_t n_ptrs)
+{
+	for (size_t i = 0; i < n_ptrs; ++i)
+	{
+		if (!ptrs[i])
+			return false;
+	}
+
+	return true;
+}
 
 extern "C" erasure_encoder erasure_create_encoder(
 	const erasure_encoder_parameters* params,
@@ -18,7 +30,7 @@ extern "C" erasure_encoder erasure_create_encoder(
 
 		return erasure::create_encoder(
 				*params,
-				(erasure::encoder_flags)flags);
+				flags);
 	} 
 	catch (...)
 	{
@@ -45,9 +57,14 @@ extern "C" enum erasure_error_code erasure_encode(
 	if (!encoder || !shards || !parity)
 		return ERASURE_INVALID_ARGUMENTS;
 
+	if (!validate(shards, encoder->n_data))
+		return ERASURE_INVALID_ARGUMENTS;
+	if (!validate(parity, encoder->n_parity))
+		return ERASURE_INVALID_ARGUMENTS;
+
 	try
 	{
-		return (erasure_error_code)erasure::encode(
+		return erasure::encode(
 			encoder,
 			shards,
 			parity);
@@ -62,18 +79,23 @@ extern "C" enum erasure_error_code erasure_encode_partial(
 	erasure_encoder encoder,
 	const uint8_t* const* shards,
 	uint8_t* const* parity,
-	const erasure_bool* present)
+	const erasure_bool* should_encode)
 {
-	if (!encoder || !shards || !parity || !present)
+	if (!encoder || !shards || !parity || !should_encode)
+		return ERASURE_INVALID_ARGUMENTS;
+
+	if (!validate(shards, encoder->n_data))
+		return ERASURE_INVALID_ARGUMENTS;
+	if (!validate(parity, encoder->n_parity))
 		return ERASURE_INVALID_ARGUMENTS;
 
 	try
 	{
-		return (erasure_error_code)erasure::encode_partial(
+		return erasure::encode_partial(
 			encoder,
 			shards,
 			parity,
-			(const bool*)present);
+			(const bool*)should_encode);
 	}
 	catch (...)
 	{
@@ -89,9 +111,12 @@ extern "C" enum erasure_error_code erasure_recover_data(
 	if (!encoder || !shards || !present)
 		return ERASURE_INVALID_ARGUMENTS;
 
+	if (!validate(shards, encoder->n_shards))
+		return ERASURE_INVALID_ARGUMENTS;
+
 	try
 	{
-		return (erasure_error_code)erasure::recover_data(
+		return erasure::recover_data(
 			encoder,
 			shards,
 			(const bool*)present);
@@ -110,9 +135,12 @@ extern "C" enum erasure_error_code erasure_recover(
 	if (!encoder || !shards || !present)
 		return ERASURE_INVALID_ARGUMENTS;
 
+	if (!validate(shards, encoder->n_shards))
+		return ERASURE_INVALID_ARGUMENTS;
+
 	try
 	{
-		return (erasure_error_code)erasure::recover(
+		return erasure::recover(
 			encoder,
 			shards,
 			(const bool*)present);
