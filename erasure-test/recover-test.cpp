@@ -7,11 +7,11 @@ static constexpr size_t data_size = 32;
 
 int main()
 {
-	encoder_flags flags[] = {
-		USE_REF_IMPL,
-		USE_ADV_IMPL,
-		USE_SSSE3_IMPL,
-		USE_AVX2_IMPL
+	erasure_encoder_flags flags[] = {
+		ERASURE_FORCE_REF_IMPL,
+		ERASURE_FORCE_ADV_IMPL,
+		ERASURE_FORCE_SSSE3_IMPL,
+		ERASURE_FORCE_AVX2_IMPL
 	};
 
 	for (auto flag : flags)

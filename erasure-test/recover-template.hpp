@@ -1,6 +1,4 @@
-#include "rs_encoder.h"
-
-using namespace erasure;
+#include "liberasure.h"
 
 #include <random>
 
@@ -9,7 +7,7 @@ alignas(64) uint8_t result[data_size * k];
 
 uint8_t* ptrs[n];
 alignas(64) uint8_t parity[data_size * (n - k)];
-bool present[n];
+erasure_bool present[n];
 
 // Default value from mt19937 argument default value
 void generate_data(unsigned seed = 5489u)
@@ -41,16 +39,16 @@ void generate_ptrs()
 	}
 }
 
-bool run_test(encoder_flags flag)
+bool run_test(erasure_encoder_flags flag)
 {
 	generate_data();
 	generate_ptrs();
 
-	encode_parameters params = { n, k, data_size };
+	erasure_encoder_parameters params = { n, k, data_size };
 
-	rs_encoder* encoder = create_encoder(params, flag);
+	erasure_encoder* encoder = erasure_create_encoder(&params, flag);
 
-	encode(encoder, ptrs, ptrs + k);
+	erasure_encode(encoder, ptrs, ptrs + k);
 
 	memcpy(result, data, sizeof(data));
 
@@ -62,9 +60,9 @@ bool run_test(encoder_flags flag)
 		}
 	}
 
-	recover(encoder, ptrs, present);
+	erasure_recover(encoder, ptrs, present);
 
-	destroy_encoder(encoder);
+	erasure_destroy_encoder(encoder);
 
 	if (memcmp(data, result, sizeof(data)) != 0)
 		return false;

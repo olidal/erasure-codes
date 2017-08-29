@@ -7,5 +7,5 @@ static constexpr size_t data_size = 145;
 
 int main()
 {
-	return run_test(USE_AVX2_IMPL) ? 0 : 1;
+	return run_test(ERASURE_FORCE_AVX2_IMPL) ? 0 : 1;
 }

@@ -46,9 +46,9 @@
 extern "C" {
 #endif
 
-typedef struct erasure_encoder_* erasure_encoder;
-typedef struct erasure_encode_stream_* erasure_encode_stream;
-typedef struct erasure_recover_stream_* erasure_recover_stream;
+typedef struct erasure_encoder_ erasure_encoder;
+typedef struct erasure_encode_stream_ erasure_encode_stream;
+typedef struct erasure_recover_stream_ erasure_recover_stream;
 
 typedef char erasure_bool;
 
@@ -78,50 +78,50 @@ enum erasure_error_code
 };
 	
 /* Block API */
-erasure_encoder erasure_create_encoder(
+erasure_encoder* erasure_create_encoder(
 	const erasure_encoder_parameters* params,
 	enum erasure_encoder_flags flags);
-void erasure_destroy_encoder(erasure_encoder encoder);
+void erasure_destroy_encoder(erasure_encoder* encoder);
 
 enum erasure_error_code erasure_encode(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	const uint8_t* const* shards,
 	uint8_t* const* parity);
 
 enum erasure_error_code erasure_encode_partial(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	const uint8_t* const* shards,
 	uint8_t* const* parity,
 	const erasure_bool* present);
 
 enum erasure_error_code erasure_recover_data(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	uint8_t* const* shards,
 	const erasure_bool* present);
 
 enum erasure_error_code erasure_recover(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	uint8_t* const* shards,
 	const erasure_bool* present);
 
 /* Stream API */
 
-erasure_encode_stream erasure_create_encode_stream(
-	erasure_encoder encoder,
+erasure_encode_stream* erasure_create_encode_stream(
+	erasure_encoder* encoder,
 	const erasure_bool* should_encode);
-erasure_recover_stream erasure_create_recover_stream(
-	erasure_encoder encoder,
+erasure_recover_stream* erasure_create_recover_stream(
+	erasure_encoder* encoder,
 	const erasure_bool* present);
 
-void erasure_destroy_encode_stream(erasure_encode_stream stream);
-void erasure_destroy_recover_stream(erasure_recover_stream stream);
+void erasure_destroy_encode_stream(erasure_encode_stream* stream);
+void erasure_destroy_recover_stream(erasure_recover_stream* stream);
 
 enum erasure_error_code erasure_stream_encode(
-	erasure_encode_stream stream,
+	erasure_encode_stream* stream,
 	const uint8_t* const* shards,
 	uint8_t* const* parity);
 enum erasure_error_code erasure_stream_recover_data(
-	erasure_recover_stream stream,
+	erasure_recover_stream* stream,
 	uint8_t* const* shards);
 
 #ifdef __cplusplus

@@ -14,7 +14,8 @@ bool validate(const uint8_t* const* ptrs, size_t n_ptrs)
 	return true;
 }
 
-extern "C" erasure_encoder erasure_create_encoder(
+/* Block API */
+extern "C" erasure_encoder* erasure_create_encoder(
 	const erasure_encoder_parameters* params,
 	enum erasure_encoder_flags flags)
 {
@@ -37,7 +38,7 @@ extern "C" erasure_encoder erasure_create_encoder(
 		return nullptr;
 	}
 }
-extern "C" void erasure_destroy_encoder(erasure_encoder encoder)
+extern "C" void erasure_destroy_encoder(erasure_encoder* encoder)
 {
 	try
 	{
@@ -50,7 +51,7 @@ extern "C" void erasure_destroy_encoder(erasure_encoder encoder)
 }
 
 extern "C" enum erasure_error_code erasure_encode(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	const uint8_t* const* shards,
 	uint8_t* const* parity)
 {
@@ -76,7 +77,7 @@ extern "C" enum erasure_error_code erasure_encode(
 }
 
 extern "C" enum erasure_error_code erasure_encode_partial(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	const uint8_t* const* shards,
 	uint8_t* const* parity,
 	const erasure_bool* should_encode)
@@ -104,7 +105,7 @@ extern "C" enum erasure_error_code erasure_encode_partial(
 }
 
 extern "C" enum erasure_error_code erasure_recover_data(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	uint8_t* const* shards,
 	const erasure_bool* present)
 {
@@ -128,7 +129,7 @@ extern "C" enum erasure_error_code erasure_recover_data(
 }
 
 extern "C" enum erasure_error_code erasure_recover(
-	erasure_encoder encoder,
+	erasure_encoder* encoder,
 	uint8_t* const* shards,
 	const erasure_bool* present)
 {
@@ -150,3 +151,88 @@ extern "C" enum erasure_error_code erasure_recover(
 		return ERASURE_INTERNAL_ERROR;
 	}
 }
+
+/* Stream API */
+extern "C" erasure_encode_stream* erasure_create_encode_stream(
+	erasure_encoder* encoder,
+	const erasure_bool* should_encode)
+{
+	if (!encoder || !should_encode)
+		return nullptr;
+
+	try
+	{
+		return erasure::create_encode_stream(
+			encoder,
+			(const bool*)should_encode);
+	}
+	catch (...)
+	{
+		return nullptr;
+	}
+}
+extern "C" erasure_recover_stream* erasure_create_recover_stream(
+	erasure_encoder* encoder,
+	const erasure_bool* present)
+{
+	if (!encoder || !present)
+		return nullptr;
+
+	try
+	{
+		return erasure::create_recover_stream(
+			encoder,
+			(const bool*)present);
+	}
+	catch (...)
+	{
+		return nullptr;
+	}
+}
+
+extern "C" void erasure_destroy_encode_stream(
+	erasure_encode_stream* stream)
+{
+	erasure::destroy_stream(stream);
+}
+extern "C" void erasure_destroy_recover_stream(
+	erasure_recover_stream* stream)
+{
+	erasure::destroy_stream(stream);
+}
+
+extern "C" erasure_error_code erasure_stream_encode(
+	erasure_encode_stream* stream,
+	const uint8_t* const* shards,
+	uint8_t* const* parity)
+{
+	if (!stream || !shards || !parity)
+		return ERASURE_INVALID_ARGUMENTS;
+
+	try
+	{
+		return erasure::stream_encode(stream, shards, parity);
+	}
+	catch (...)
+	{
+		return ERASURE_INTERNAL_ERROR;
+	}
+}
+extern "C" erasure_error_code erasure_stream_recover_data(
+	erasure_recover_stream* stream,
+	uint8_t* const* shards)
+{
+	if (!stream || !shards)
+		return ERASURE_INVALID_ARGUMENTS;
+
+	try
+	{
+		return erasure::stream_recover_data(stream, shards);
+	}
+	catch (...)
+	{
+		return ERASURE_INTERNAL_ERROR;
+	}
+}
+
+
