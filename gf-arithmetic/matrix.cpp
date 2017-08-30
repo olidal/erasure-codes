@@ -127,7 +127,6 @@ namespace gfarith
 		return m;
 	}
 
-	
 	matrix operator*(const matrix& a, const matrix& b)
 	{
 		assert(a.size2() == b.size1());
@@ -151,5 +150,60 @@ namespace gfarith
 		}
 
 		return result;
+	}
+
+	void div_row(symbol* row, symbol divisor, size_t length)
+	{
+		for (size_t i = 0; i < length; ++i)
+			row[i] /= divisor;
+	}
+	// Subtract row2 from row1 and store the result in row1
+	void sub_rows(symbol* row1, const symbol* row2, size_t length)
+	{
+		for (size_t i = 0; i < length; ++i)
+			row1[i] -= row2[i];
+	}
+
+	matrix matrix::inverse() const
+	{
+		assert(rows == cols);
+
+		if (this->is_null())
+			return matrix();
+
+		matrix m{ rows, cols * 2 };
+
+		std::memset(m.data(), 0, m.datasize());
+
+		for (size_t i = 0; i < rows; ++i)
+		{
+			std::memcpy(m[i].data(), (*this)[i].data(), cols * sizeof(symbol));
+
+			m(i, cols + i) = 1;
+		}
+
+		for (size_t r1 = 0; r1 < m.size1(); ++r1)
+		{
+			symbol div = m(r1, r1);
+
+			assert(div.value != 0);
+			if (div.value != 1)
+			{
+				for (size_t c = r1; c < m.size2(); ++c)
+				{
+					m(r1, c) /= div;
+				}
+			}
+
+			for (size_t r2 = r1 + 1; r2 < m.size1(); ++r2)
+			{
+				for (size_t c = r1; c < m.size2(); ++c)
+				{
+					m(r2, c) -= m(r1, c);
+				}
+			}
+		}
+
+		return m;
 	}
 }

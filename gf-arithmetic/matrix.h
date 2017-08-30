@@ -18,13 +18,13 @@ namespace gfarith
 
 		symbol& operator[](size_t i)
 		{
-			assert(i < values);
+			assert(i < length);
 
 			return values[i];
 		}
 		const symbol& operator[](size_t i) const
 		{
-			assert(i < values);
+			assert(i < length);
 
 			return values[i];
 		}
