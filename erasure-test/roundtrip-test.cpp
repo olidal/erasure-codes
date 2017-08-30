@@ -1,6 +1,5 @@
-#include "rs_encoder.h"
+#include "liberasure.h"
 
-using namespace erasure;
 
 #include <random>
 
@@ -12,7 +11,7 @@ static constexpr size_t data_size = sizeof(data) / sizeof(uint8_t) / k;
 
 uint8_t* ptrs[n];
 uint8_t parity[data_size * (n - k)];
-bool present[n];
+erasure_bool present[n];
 
 // Default value from mt19937 argument default value
 void generate_data(unsigned seed = 5489u)
@@ -49,17 +48,17 @@ int main()
 	generate_data();
 	generate_ptrs();
 
-	encode_parameters params = { n, k, data_size };
+	erasure_encoder_parameters params = { n, k, data_size };
 
-	rs_encoder* encoder = create_encoder(params);
+	erasure_encoder* encoder = erasure_create_encoder(&params, ERASURE_DEFAULT);
 
-	encode(encoder, ptrs, ptrs + k);
+	erasure_encode(encoder, ptrs, ptrs + k);
 
 	memcpy(result, data, sizeof(data));
 
-	recover(encoder, ptrs, present);
+	erasure_recover(encoder, ptrs, present);
 
-	destroy_encoder(encoder);
+	erasure_destroy_encoder(encoder);
 
 	if (memcmp(data, result, sizeof(data)) != 0)
 		return 1;

@@ -1,6 +1,4 @@
-#include "rs_encoder.h"
-
-using namespace erasure;
+#include "liberasure.h"
 
 #include <random>
 
@@ -14,7 +12,7 @@ alignas(64) uint8_t result2[data_size * k];
 
 uint8_t* ptrs[n];
 uint8_t parity[data_size * (n - k)];
-bool present[n];
+erasure_bool present[n];
 
 // Default value from mt19937 argument default value
 void generate_data(unsigned seed = 5489u)
@@ -46,16 +44,16 @@ void generate_ptrs()
 	}
 }
 
-void run_test(encoder_flags flag, void* data_ptr)
+void run_test(erasure_encoder_flags flag, void* data_ptr)
 {
 	generate_data();
 	generate_ptrs();
 
-	encode_parameters params = { n, k, data_size };
+	erasure_encoder_parameters params = { n, k, data_size };
 
-	rs_encoder* encoder = create_encoder(params, flag);
+	erasure_encoder* encoder = erasure_create_encoder(&params, flag);
 
-	encode(encoder, ptrs, ptrs + k);
+	erasure_encode(encoder, ptrs, ptrs + k);
 
 	memcpy(data_ptr, data, sizeof(data));
 
@@ -67,15 +65,15 @@ void run_test(encoder_flags flag, void* data_ptr)
 		}
 	}
 
-	recover(encoder, ptrs, present);
+	erasure_recover(encoder, ptrs, present);
 
-	destroy_encoder(encoder);
+	erasure_destroy_encoder(encoder);
 }
 
 int main()
 {
-	run_test(USE_REF_IMPL, result1);
-	run_test(USE_SSSE3_IMPL, result2);
+	run_test(ERASURE_FORCE_REF_IMPL, result1);
+	run_test(ERASURE_FORCE_SSSE3_IMPL, result2);
 
 	if (memcmp(result1, result2, sizeof(data)) != 0)
 		return 1;
