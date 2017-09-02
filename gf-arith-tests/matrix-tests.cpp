@@ -54,7 +54,7 @@ int main()
 {
 	bool result = true;
 
-	for (size_t i = 3; i < 64; ++i)
+	for (size_t i = 1; i < 64; ++i)
 	{
 		if (!test_identity_inverse(i))
 		{
