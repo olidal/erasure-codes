@@ -9,6 +9,8 @@ namespace gfarith
 	{
 		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes)
 		{
+			assert(num_bytes % sizeof(__m256i) == 0);
+
 			const __m256i mask = _mm256_set1_epi8(0x0F);
 			// Load the entire lookup table into the lo register
 			__m256i lo = _mm256_load_si256((const __m256i*)lohi_table[val][0]);
@@ -41,6 +43,8 @@ namespace gfarith
 		}
 		void mul_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes)
 		{
+			assert(num_bytes % sizeof(__m256i) == 0);
+
 			const __m256i mask = _mm256_set1_epi8(0x0F);
 			// Load the entire lookup table into the lo register
 			__m256i lo = _mm256_load_si256((const __m256i*)lohi_table[val][0]);

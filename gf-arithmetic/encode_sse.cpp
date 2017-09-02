@@ -13,6 +13,8 @@ namespace gfarith
 			uint8_t* out, 
 			size_t num_bytes)
 		{
+			assert(num_bytes % sizeof(__m128i) == 0);
+
 			const __m128i mask = _mm_set1_epi8(0x0F);
 
 			__m128i lo = _mm_load_si128((const __m128i*)lohi_table[val][0]);
