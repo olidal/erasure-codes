@@ -72,7 +72,7 @@ namespace erasure
 		{
 			if (present[i])
 			{
-				decode.row(n_inputs) = m.row(i);
+				decode[n_inputs] = m[i];
 				inputs[n_inputs] = i;
 				++n_inputs;
 			}
@@ -86,7 +86,7 @@ namespace erasure
 			if (!present[i])
 			{
 				outputs[n_outputs] = i;
-				decode.row(n_outputs) = decode.row(i);
+				decode[n_outputs] = decode[i];
 				++n_outputs;
 			}
 		}

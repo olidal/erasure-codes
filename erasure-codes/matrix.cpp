@@ -26,21 +26,12 @@ namespace erasure
 
 	bool inverse(matrix& m)
 	{
-		assert(m.size1() == m.size2());
+		matrix inv = m.inverse();
 
-		blas_matrix mat = blas_matrix{ m.size1(), m.size2() };
-		std::copy(m.data(), m.data() + m.size(), mat.data().begin());
-
-		permutation_matrix<uint8_t> pm(mat.size1());
-
-		if (ublas::lu_factorize(mat, pm) != 0)
+		if (inv.is_null())
 			return false;
 
-		blas_matrix inverse = identity_matrix<symbol>(mat.size1());
-
-		ublas::lu_substitute(mat, pm, inverse);
-
-		std::copy(inverse.data().begin(), inverse.data().end(), m.data());
+		m = inv;
 
 		return true;
 	}
@@ -53,7 +44,7 @@ namespace erasure
 		{
 			for (uint8_t c = 0; c < k; ++c)
 			{
-				m(r, c) = symbol::exp(r, c);
+				m(r, c) = gfarith::exp(r, c);
 			}
 		}
 
