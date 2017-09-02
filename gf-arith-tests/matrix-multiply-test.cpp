@@ -25,7 +25,7 @@ int main()
 {
 	bool result = true;
 
-	for (size_t i = 1; i < 128; ++i)
+	for (size_t i = 1; i < 64; ++i)
 	{
 		if (!test_multiplication(i))
 		{

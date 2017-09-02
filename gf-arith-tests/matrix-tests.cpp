@@ -50,6 +50,14 @@ bool test_inverse(size_t sz)
 	return r == matrix(sz, sz, 1);
 }
 
+bool test_singular(size_t sz)
+{
+	// Create a singular matrix
+	matrix m = matrix(sz, sz, 0);
+
+	return m.inverse().is_null();
+}
+
 int main()
 {
 	bool result = true;

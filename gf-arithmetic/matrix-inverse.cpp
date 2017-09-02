@@ -10,8 +10,8 @@
 namespace {
 #define SWAP(a,b,e) std::swap(a,b)
 	typedef uint8_t gf;
-	
-	void addmul(gf* dst, gf* src, gf c, size_t sz)
+
+	void addmul(gf* dst, gf* src, gf c, int sz)
 	{
 		if (c != 0)
 			gfarith::adv::mul_add_row(c, src, dst, sz);
@@ -21,15 +21,15 @@ namespace {
 	//      that was written myself.
 	//      Preferably something easier
 	//      to understand and maintain.
-	static int invert_mat(gf *src, uint8_t k)
+	static int invert_mat(gf *src, int k)
 	{
 		gf c, *p;
-		uint8_t irow, icol, row, col, i, ix;
+		int irow, icol, row, col, i, ix;
 
 		int error = 1;
-		uint8_t* indxc = (uint8_t*)alloca(sizeof(uint8_t) * k);
-		uint8_t* indxr = (uint8_t*)alloca(sizeof(uint8_t) * k);
-		uint8_t* ipiv = (uint8_t*)alloca(sizeof(uint8_t) * k);
+		int* indxc = (int*)alloca(sizeof(int) * k);
+		int* indxr = (int*)alloca(sizeof(int) * k);
+		int* ipiv = (int*)alloca(sizeof(int) * k);
 		gf* id_row = (gf*)alloca(sizeof(gf) * k);
 
 		memset(id_row, 0, k * sizeof(gf));
@@ -144,7 +144,7 @@ namespace gfarith
 	matrix matrix::inverse() const
 	{
 		assert(size1() == size2());
-		assert(size1() < 256);
+		assert(size1() <= INT_MAX);
 
 		if (this->is_null())
 			return matrix();
@@ -152,7 +152,7 @@ namespace gfarith
 		matrix m = *this;
 		gf* vals = (gf*)m.data();
 
-		if (invert_mat(vals, (uint8_t)size1()) != 0)
+		if (invert_mat(vals, (int)size1()) != 0)
 			return matrix();
 
 		return m;
