@@ -36,7 +36,7 @@ namespace gfarith
 			size_t mindim = rows < cols ? rows : cols;
 			for (size_t i = 0; i < mindim; ++i)
 			{
-				values[i] = diag;
+				(*this)(i, i) = diag;
 			}
 		}
 	}
@@ -151,19 +151,7 @@ namespace gfarith
 
 		return result;
 	}
-
-	void div_row(symbol* row, symbol divisor, size_t length)
-	{
-		for (size_t i = 0; i < length; ++i)
-			row[i] /= divisor;
-	}
-	// Subtract row2 from row1 and store the result in row1
-	void sub_rows(symbol* row1, const symbol* row2, size_t length)
-	{
-		for (size_t i = 0; i < length; ++i)
-			row1[i] -= row2[i];
-	}
-
+	
 	matrix matrix::inverse() const
 	{
 		assert(rows == cols);
@@ -197,13 +185,15 @@ namespace gfarith
 
 			for (size_t r2 = r1 + 1; r2 < m.size1(); ++r2)
 			{
+				symbol mult = m(r2, r1);
+
 				for (size_t c = r1; c < m.size2(); ++c)
 				{
-					m(r2, c) -= m(r1, c);
+					m(r2, c) -= m(r1, c) * mult;
 				}
 			}
 		}
 
-		return m;
+		return m.submatrix(0, rows, cols, cols * 2);
 	}
 }

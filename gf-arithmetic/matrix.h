@@ -14,7 +14,12 @@ namespace gfarith
 		symbol* values;
 
 	public:
-		matrix_row(size_t length, symbol* values);
+		matrix_row(size_t length, symbol* values) :
+			length(length),
+			values(values)
+		{
+
+		}
 
 		symbol& operator[](size_t i)
 		{
@@ -138,7 +143,7 @@ namespace gfarith
 
 		bool is_null() const
 		{
-			return values != 0;
+			return values == 0;
 		}
 	};
 

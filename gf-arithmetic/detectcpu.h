@@ -1,3 +1,5 @@
+#ifndef GFARITH_CPUDETECT_H
+#define GFARITH_CPUDETECT_H
 
 #if defined(__arm__) || defined(__TARGET_ARCH_ARM)
 #if defined(__ARM_ARCH_7__) \\
@@ -37,4 +39,6 @@
 #endif
 #else
 #define GFARITH_ARCH_UNKNOWN
+#endif
+
 #endif
