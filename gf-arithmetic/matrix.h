@@ -55,6 +55,8 @@ namespace gfarith
 		{
 			return values;
 		}
+
+		matrix_row& operator=(const matrix_row& r);
 	};
 
 	class matrix
@@ -148,6 +150,9 @@ namespace gfarith
 	};
 
 	matrix operator*(const matrix& a, const matrix& b);
+
+	bool operator==(const matrix& a, const matrix& b);
+	bool operator!=(const matrix& a, const matrix& b);
 }
 
 #endif

@@ -151,4 +151,29 @@ namespace gfarith
 
 		return result;
 	}
+
+	matrix_row& matrix_row::operator=(const matrix_row& m)
+	{
+		assert(this->size1() == m.size1());
+
+		std::memcpy(this->data(), m.data(), m.size() * sizeof(symbol));
+
+		return *this;
+	}
+
+	bool operator==(const matrix& a, const matrix& b)
+	{
+		if (a.size1() != b.size1() || a.size2() != b.size2())
+			return false;
+		if (a.is_null() && b.is_null())
+			return true;
+		if (a.is_null() || b.is_null())
+			return false;
+
+		return std::memcmp(a.data(), b.data(), a.size() * sizeof(symbol)) == 0;
+	}
+	bool operator !=(const matrix& a, const matrix& b)
+	{
+		return !(a == b);
+	}
 }
