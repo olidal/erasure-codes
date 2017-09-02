@@ -3,37 +3,17 @@
 #include <cstring>
 #include <iostream>
 
+#include "catch-wrapper.hpp"
+
 using namespace gfarith;
 
-bool operator ==(const matrix& a, const matrix& b)
+TEST_CASE("indentity multiplication", "[matrix]")
 {
-	if (a.size1() != b.size1() || a.size2() != b.size2())
-		return false;
-
-	return memcmp(a.data(), b.data(), a.size() * sizeof(symbol)) == 0;
-}
-
-bool test_multiplication(size_t sz)
-{
-	matrix m = matrix(sz, sz, 1);
-
-	// Identity multiplied by itself is identity
-	return m * m == m;
-}
-
-int main()
-{
-	bool result = true;
-
-	for (size_t i = 1; i < 64; ++i)
+	constexpr size_t sizes[] = { 1, 3, 4, 5, 9, 129 };
+	for (size_t sz : sizes)
 	{
-		if (!test_multiplication(i))
-		{
-			std::cout << "Matrix multiplication failed with dimensions ("
-				<< i << ", " << i << ")" << std::endl;
-			result = false;
-		}
-	}
+		matrix m = matrix(sz, sz, 1);
 
-	return result ? 0 : 1;
+		REQUIRE(m * m == m);
+	}
 }

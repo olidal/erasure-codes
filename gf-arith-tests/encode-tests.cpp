@@ -6,6 +6,8 @@
 #include <cstring>
 #include <numeric>
 
+#include "catch-wrapper.hpp"
+
 using namespace gfarith;
 
 matrix vandermonde(size_t n, size_t k)
@@ -27,7 +29,7 @@ typedef decltype(&adv::mul_row) mul_row_proc;
 typedef mul_row_proc mul_add_row_proc;
 
 bool test_method(
-	size_t num_bytes, 
+	size_t num_bytes,
 	mul_row_proc mul_add,
 	uint8_t expected)
 {
@@ -38,7 +40,7 @@ bool test_method(
 	std::memset(out, 0x63, sizeof(uint8_t) * num_bytes);
 
 	mul_add(0x31, in, out, num_bytes);
-	
+
 	bool result = true;
 
 	for (size_t i = 0; i < num_bytes; ++i)
@@ -66,7 +68,6 @@ bool mul_add_row_test(
 		gfarith::add(0x63, gfarith::mul(0x31, 0x8))
 	);
 }
-
 bool mul_row_test(
 	size_t num_bytes,
 	mul_row_proc proc)
@@ -78,43 +79,28 @@ bool mul_row_test(
 	);
 }
 
-int main()
-{
-	bool results[] = {
-		mul_add_row_test(32,     &adv::mul_add_row),
-		mul_add_row_test(666,    &adv::mul_add_row),
-		mul_add_row_test(1,      &adv::mul_add_row),
-		mul_add_row_test(519217, &adv::mul_add_row),
-		mul_add_row_test(32,     &ssse3::mul_add_row),
-		mul_add_row_test(640,    &ssse3::mul_add_row),
-		mul_add_row_test(1024,   &ssse3::mul_add_row),
-		mul_add_row_test(519216, &ssse3::mul_add_row),
-		mul_add_row_test(32,     &avx2::mul_add_row),
-		mul_add_row_test(640,    &avx2::mul_add_row),
-		mul_add_row_test(1024,   &avx2::mul_add_row),
-		mul_add_row_test(519200, &avx2::mul_add_row),
-		mul_row_test(32,     &adv::mul_row),
-		mul_row_test(666,    &adv::mul_row),
-		mul_row_test(1,      &adv::mul_row),
-		mul_row_test(519217, &adv::mul_row),
-		mul_row_test(32,     &ssse3::mul_row),
-		mul_row_test(640,    &ssse3::mul_row),
-		mul_row_test(1024,   &ssse3::mul_row),
-		mul_row_test(519216, &ssse3::mul_row),
-		mul_row_test(32,     &avx2::mul_row),
-		mul_row_test(640,    &avx2::mul_row),
-		mul_row_test(1024,   &avx2::mul_row),
-		mul_row_test(519200, &avx2::mul_row),
-	};
+constexpr size_t sizes[] = { 1, 32, 666, 99, 519217 };
 
-	const size_t cnt = std::accumulate(
-		std::begin(results),
-		std::end(results),
-		size_t(0)
-	);
-	const size_t expected = std::size(results);
-	
-	if (cnt == expected)
-		return 0;
-	return 1;
+TEST_CASE("mul_add_row test", "[encode]")
+{
+	for (size_t num_bytes : sizes)
+	{
+		REQUIRE(mul_add_row_test(num_bytes, adv::mul_add_row));
+		if (num_bytes > 15)
+			REQUIRE(mul_add_row_test(num_bytes & ~15, ssse3::mul_add_row));
+		if (num_bytes > 31)
+			REQUIRE(mul_add_row_test(num_bytes & ~31, avx2::mul_add_row));
+	}
+}
+
+TEST_CASE("mul_row test", "[encode]")
+{
+	for (size_t num_bytes : sizes)
+	{
+		REQUIRE(mul_row_test(num_bytes, adv::mul_row));
+		if (num_bytes > 15)
+			REQUIRE(mul_row_test(num_bytes & ~15, ssse3::mul_row));
+		if (num_bytes > 31)
+			REQUIRE(mul_row_test(num_bytes & ~31, avx2::mul_row));
+	}
 }
