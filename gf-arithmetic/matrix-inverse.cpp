@@ -143,6 +143,33 @@ namespace gfarith
 {
 	matrix matrix::inverse() const
 	{
+		if (this->is_null())
+			return matrix();
+
+		assert(size1() == size2());
+		
+		matrix m = matrix(size1(), size2() * 2);
+
+		for (size_t r = 0; r < m.size1(); ++r)
+		{
+			std::copy(m[i]
+		}
+
+		for (size_t r1 = 0; r1 < m.size1(); ++r1)
+		{
+			symbol div = m(r1, r1);
+
+			assert(div.value != 0);
+
+			for (size_t c = 0; c < m.size2(); ++c)
+			{
+				m(r1, c) /=
+			}
+		}
+	}
+
+	matrix matrix::inverse() const
+	{
 		assert(size1() == size2());
 		assert(size1() <= INT_MAX);
 

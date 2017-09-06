@@ -57,6 +57,23 @@ namespace gfarith
 		}
 
 		matrix_row& operator=(const matrix_row& r);
+
+		symbol* begin()
+		{
+			return values;
+		}
+		symbol* end()
+		{
+			return values + length;
+		}
+		const symbol* begin() const
+		{
+			return values;
+		}
+		const symbol* end() const
+		{
+			return values + length;
+		}
 	};
 
 	class matrix

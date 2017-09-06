@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace erasure
+namespace gfarith
 {
 	uint8_t mul(uint8_t a, uint8_t b);
 	uint8_t div(uint8_t a, uint8_t b);
@@ -23,7 +23,7 @@ namespace erasure
 
 		static symbol exp(symbol a, symbol b)
 		{
-			return erasure::exp(a.value, b.value);
+			return gfarith::exp(a.value, b.value);
 		}
 
 		explicit operator uint8_t() const
