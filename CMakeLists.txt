@@ -20,6 +20,7 @@ find_package(boost REQUIRED COMPONENTS numeric)
 add_subdirectory(gf-arithmetic)
 add_subdirectory(erasure-codes)
 add_subdirectory(lohi-generator)
+add_subdirectory(log-table-generator)
 
 # Testing
 add_subdirectory(erasure-tests)

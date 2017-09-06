@@ -129,10 +129,10 @@ namespace gfarith
 
 	matrix operator*(const matrix& a, const matrix& b)
 	{
-		assert(a.size2() == b.size1());
-
 		if (a.is_null() || b.is_null())
 			return matrix();
+
+		assert(a.size2() == b.size1());
 
 		matrix result(a.size1(), b.size2());
 

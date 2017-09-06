@@ -39,6 +39,17 @@ TEST_CASE("identity inverse", "[matrix]")
 	}
 }
 
+TEST_CASE("vandermonde inverse is not null", "[matrix]")
+{
+	for (size_t sz : sizes)
+	{
+		matrix m = vandermonde(sz, sz);
+		matrix m2 = m.inverse();
+
+		REQUIRE(!m2.is_null());
+	}
+}
+
 TEST_CASE("vandermonde inverse", "[matrix]")
 {
 	for (size_t sz : sizes)
