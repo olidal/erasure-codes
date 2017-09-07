@@ -10,7 +10,7 @@ add_custom_command(
 	COMMAND generate-log-tables log_tables.cpp
 )
 # Make dependencies work
-add_custom_target(log_tables log_tables.cpp)
+add_custom_target(log_tables ALL DEPENDS log_tables.cpp)
 # log_tables depends on generate-log-tables
 add_dependencies(log_tables generate-log-tables)
 set_target_properties(log_tables PROPERTIES FOLDER internal-targets)
@@ -21,7 +21,7 @@ add_custom_command(
 	COMMAND generate-lohi-table > lohi_table.cpp
 )
 # Make dependencies work
-add_custom_target(lohi_table lohi_table.cpp)
+add_custom_target(lohi_table ALL DEPENDS lohi_table.cpp)
 add_dependencies(lohi_table generate-lohi-table)
 set_target_properties(lohi_table PROPERTIES FOLDER internal-targets)
 
