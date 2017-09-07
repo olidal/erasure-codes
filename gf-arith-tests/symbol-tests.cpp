@@ -92,3 +92,10 @@ TEST_CASE("0 + x = x", "[symbol]")
 		REQUIRE(gfarith::add(0, (uint8_t)i) == i);
 	}
 }
+
+TEST_CASE("2^2 == 0x04", "[symbol]")
+{
+	uint8_t a = gfarith::exp(2, 2);
+
+	REQUIRE(a == 0x4);
+}
