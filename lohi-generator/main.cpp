@@ -1,14 +1,21 @@
 #include "symbol.h"
 
-#include <sstream>
+#include <iostream>
+#include <fstream>
 
 using namespace gfarith;
 
 int main(int argc, char** argv)
 {
-	std::stringstream ss;
+	if (argc < 2)
+		return -1;
 
-	ss << "{\n" << std::hex;
+	std::ofstream ss{ argv[1] };
+
+	ss << "#include <cstdint>\n\n"
+		<< "namespace gfarith\n{\n";
+
+	ss << "\tuint8_t lohi_table[256][2][16] = {\n" << std::hex;
 
 	bool b1 = false, b2 = false;
 	for (size_t i = 0; i < 256; ++i)
@@ -18,7 +25,7 @@ int main(int argc, char** argv)
 		else
 			b1 = true;
 
-		ss << "{ {";
+		ss << "\t\t{ {";
 
 		b2 = false;
 		for (size_t j = 0; j < 16; ++j)
@@ -47,9 +54,7 @@ int main(int argc, char** argv)
 		ss << "} }";
 	}
 
-	ss << "\n}";
-
-	printf("%s", ss.str().c_str());
-
+	ss << "\n\t};\n}\n";
+	
 	return 0;
 }
