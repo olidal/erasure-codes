@@ -1,9 +1,13 @@
 #include "stream_api.h"
 #include "encoder_internal.h"
 
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-
 #include <numeric>
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#else
+#include <alloca.h>
+#endif
 
 struct erasure_encode_stream_
 {
@@ -29,10 +33,7 @@ namespace erasure
 	// cases other than n_data == n_shards
 #	define STACKALLOC_IS_ALLOCA
 #endif
-
-	namespace ublas = boost::numeric::ublas;
-
-
+	
 	encode_stream* create_encode_stream(
 		rs_encoder* encoder,
 		const bool* should_encode)

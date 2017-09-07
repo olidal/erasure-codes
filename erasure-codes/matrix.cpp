@@ -13,17 +13,8 @@
 
 #include "matrix.h"
 
-#include <boost/numeric/ublas/lu.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-
 namespace erasure
 {
-	using boost::numeric::ublas::permutation_matrix;
-	using boost::numeric::ublas::identity_matrix;
-	typedef boost::numeric::ublas::matrix<symbol> blas_matrix;
-
-	using namespace boost::numeric;
-
 	bool inverse(matrix& m)
 	{
 		matrix inv = m.inverse();
