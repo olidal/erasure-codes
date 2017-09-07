@@ -1,9 +1,23 @@
 #include "matrix.h"
 #include <iostream>
 
-using erasure::symbol;
-using erasure::matrix;
-using erasure::inverse;
+using gfarith::symbol;
+using gfarith::matrix;
+
+matrix vandermonde(size_t n, size_t k)
+{
+	matrix m{ n, k };
+
+	for (size_t r = 0; r < n; ++r)
+	{
+		for (size_t c = 0; c < k; ++c)
+		{
+			m(r, c) = gfarith::exp((uint8_t)r, (uint8_t)c);
+		}
+	}
+
+	return m;
+}
 
 bool operator ==(const matrix& a, const matrix& b)
 {
@@ -21,9 +35,7 @@ bool test_identity_inverse(size_t sz)
 	for (size_t i = 0; i < sz; ++i)
 		m(i, i) = 1;
 
-	matrix m2 = m;
-	if (!inverse(m))
-		return false;
+	matrix m2 = m.inverse();
 
 	return memcmp(m.data(), m2.data(), 
 		sizeof(symbol) * m.size()) == 0;
@@ -31,21 +43,26 @@ bool test_identity_inverse(size_t sz)
 
 bool test_inverse(size_t sz)
 {
-	matrix m = erasure::vandermonde(sz, sz);
-	matrix m2 = m;
-	
-	// A square vandermonde matrix is always invertible
-	if (!inverse(m2))
-		return false;
+	matrix m = vandermonde(sz, sz);
+	matrix m2 = m.inverse();
+	matrix r = m * m2;
 
-	return m * m2 == matrix(sz, sz, 1);
+	return r == matrix(sz, sz, 1);
+}
+
+bool test_singular(size_t sz)
+{
+	// Create a singular matrix
+	matrix m = matrix(sz, sz, 0);
+
+	return m.inverse().is_null();
 }
 
 int main()
 {
 	bool result = true;
 
-	for (size_t i = 1; i < 128; ++i)
+	for (size_t i = 1; i < 64; ++i)
 	{
 		if (!test_identity_inverse(i))
 		{
