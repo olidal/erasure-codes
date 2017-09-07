@@ -141,7 +141,7 @@ namespace {
 
 namespace gfarith
 {
-	/*
+	
 	matrix matrix::inverse() const
 	{
 		if (this->is_null())
@@ -153,9 +153,12 @@ namespace gfarith
 
 		std::memset(m.data(), 0, m.datasize());
 
+		// Initialize the extended matrix
 		for (size_t r = 0; r < m.size1(); ++r)
 		{
+			// Copy our matrix value
 			std::copy((*this)[r].begin(), (*this)[r].end(), m[r].begin());
+			// Inverse is initialized to the identity matrix
 			m(r, r + size2()) = 1;
 		}
 
@@ -167,6 +170,8 @@ namespace gfarith
 			{
 				matrix tmp(1, m.size2());
 
+				// Swap the row with one that doesn't have a 0
+				// along the diagonal
 				for (size_t r2 = r1 + 1; r2 < m.size1(); ++r2)
 				{
 					if (m(r2, r1).value != 0)
@@ -186,13 +191,19 @@ namespace gfarith
 					return matrix();
 			}
 			
-			for (size_t c = r1; c < m.size2(); ++c)
+			if (div.value != 1)
 			{
-				m(r1, c) /= div;
+				for (size_t c = r1; c < m.size2(); ++c)
+				{
+					m(r1, c) /= div;
+				}
 			}
 
-			for (size_t r2 = r1 + 1; r2 < m.size1(); ++r2)
+			for (size_t r2 = 0; r2 < m.size1(); ++r2)
 			{
+				if (r2 == r1)
+					continue;
+
 				symbol mult = m(r2, r1);
 
 				for (size_t c = 0; c < m.size2(); ++c)
@@ -204,7 +215,8 @@ namespace gfarith
 
 		return m.submatrix(0, size1(), size1(), size1() * 2);
 	}
-	*/
+	//*/
+	/*
 	matrix matrix::inverse() const
 	{
 		assert(size1() == size2());
@@ -221,4 +233,5 @@ namespace gfarith
 	
 		return m;
 	}
+	//*/
 }
