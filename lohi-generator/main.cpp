@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 	ss << "#include <cstdint>\n\n"
 		<< "namespace gfarith\n{\n";
 
-	ss << "\tuint8_t lohi_table[256][2][16] = {\n" << std::hex;
+	ss << "\talignas(64) const uint8_t lohi_table[256][2][16] = {\n" << std::hex;
 
 	bool b1 = false, b2 = false;
 	for (size_t i = 0; i < 256; ++i)
