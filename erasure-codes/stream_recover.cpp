@@ -1,9 +1,13 @@
 #include "stream_api.h"
 #include "encoder_internal.h"
 
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-
 #include <numeric>
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#else
+#include <alloca.h>
+#endif
 
 struct erasure_recover_stream_
 {
@@ -31,9 +35,7 @@ namespace erasure
 	// cases other than n_data == n_shards
 #	define STACKALLOC_IS_ALLOCA
 #endif
-
-	namespace ublas = boost::numeric::ublas;
-
+	
 	recover_stream* create_recover_stream(
 		rs_encoder* encoder,
 		const bool* present)
@@ -72,7 +74,7 @@ namespace erasure
 		{
 			if (present[i])
 			{
-				decode.row(n_inputs) = m.row(i);
+				decode[n_inputs] = m[i];
 				inputs[n_inputs] = i;
 				++n_inputs;
 			}
@@ -86,7 +88,7 @@ namespace erasure
 			if (!present[i])
 			{
 				outputs[n_outputs] = i;
-				decode.row(n_outputs) = decode.row(i);
+				decode[n_outputs] = decode[i];
 				++n_outputs;
 			}
 		}

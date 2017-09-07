@@ -1,4 +1,4 @@
-#include "encoder_internal.h"
+#include "../encoder_internal.h"
 
 namespace erasure
 {
@@ -28,7 +28,7 @@ namespace erasure
 
 				for (size_t i = 0; i < num_bytes; ++i)
 				{
-					out[i] = add(out[i], mul(in[i], val));
+					out[i] = gfarith::add(out[i], gfarith::mul(in[i], val));
 				}
 			}
 		}

@@ -1,6 +1,8 @@
 #include "matrix.h"
 #include <iostream>
 
+#include "catch-wrapper.hpp"
+
 using gfarith::symbol;
 using gfarith::matrix;
 
@@ -19,65 +21,55 @@ matrix vandermonde(size_t n, size_t k)
 	return m;
 }
 
-bool operator ==(const matrix& a, const matrix& b)
+constexpr size_t sizes[] = { 1, 3, 4, 5, 9, 129 };
+
+TEST_CASE("identity inverse", "[matrix]")
 {
-	if (a.size1() != b.size1() || a.size2() != b.size2())
-		return false;
-
-	return memcmp(a.data(), b.data(), a.size() * sizeof(symbol)) == 0;
-}
-
-bool test_identity_inverse(size_t sz)
-{
-	matrix m{ sz, sz };
-	memset(m.data(), 0, sizeof(symbol) * m.size());
-
-	for (size_t i = 0; i < sz; ++i)
-		m(i, i) = 1;
-
-	matrix m2 = m.inverse();
-
-	return memcmp(m.data(), m2.data(), 
-		sizeof(symbol) * m.size()) == 0;
-}
-
-bool test_inverse(size_t sz)
-{
-	matrix m = vandermonde(sz, sz);
-	matrix m2 = m.inverse();
-	matrix r = m * m2;
-
-	return r == matrix(sz, sz, 1);
-}
-
-bool test_singular(size_t sz)
-{
-	// Create a singular matrix
-	matrix m = matrix(sz, sz, 0);
-
-	return m.inverse().is_null();
-}
-
-int main()
-{
-	bool result = true;
-
-	for (size_t i = 1; i < 64; ++i)
+	for (size_t sz : sizes)
 	{
-		if (!test_identity_inverse(i))
-		{
-			std::cout << "Identity inverse failed with dimensions (" 
-				<< i << ", " << i << ")" << std::endl;
-			result = false;
-		}
+		matrix m{ sz, sz };
+		memset(m.data(), 0, sizeof(symbol) * m.size());
 
-		if (!test_inverse(i))
-		{
-			std::cout << "Vandermonde inverse failed with dimensions ("
-				<< i << ", " << i << ")" << std::endl;
-			result = false;
-		}
+		for (size_t i = 0; i < sz; ++i)
+			m(i, i) = 1;
+
+		matrix m2 = m.inverse();
+
+		REQUIRE(m == m2);
 	}
-
-	return result ? 0 : 1;
 }
+
+TEST_CASE("vandermonde inverse is not null", "[matrix]")
+{
+	for (size_t sz : sizes)
+	{
+		matrix m = vandermonde(sz, sz);
+		matrix m2 = m.inverse();
+
+		REQUIRE(!m2.is_null());
+	}
+}
+
+TEST_CASE("vandermonde inverse", "[matrix]")
+{
+	for (size_t sz : sizes)
+	{
+		matrix m = vandermonde(sz, sz);
+		matrix m2 = m.inverse();
+		matrix r = m * m2;
+
+		REQUIRE(r == matrix(sz, sz, 1));
+	}
+}
+
+TEST_CASE("singular matrix", "[matrix]")
+{
+	for (size_t sz : sizes)
+	{
+		// Create a singular matrix
+		matrix m = matrix(sz, sz, 0);
+
+		REQUIRE(m.inverse().is_null());
+	}
+}
+

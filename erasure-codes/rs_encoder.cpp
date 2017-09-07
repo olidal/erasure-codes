@@ -1,9 +1,12 @@
 #include "rs_encoder.h"
 #include "encoder_internal.h"
 
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-
 #include <numeric>
+#ifdef _MSC_VER
+#include <intrin.h>
+#else
+#include <alloca.h>
+#endif
 
 namespace erasure
 {
@@ -18,9 +21,7 @@ namespace erasure
 	// cases other than n_data == n_shards
 #	define STACKALLOC_IS_ALLOCA
 #endif
-
-	using namespace boost::numeric;
-
+	
 	rs_encoder* create_encoder(
 		const encode_parameters& params,
 		encoder_flags flags)

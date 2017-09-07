@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-using namespace erasure;
+using namespace gfarith;
 
 int main(int argc, char** argv)
 {

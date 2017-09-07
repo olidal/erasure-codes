@@ -2,6 +2,7 @@
 #define ERASURE_ENCODER_INTERNAL_H
 
 #include "liberasure.h"
+#include <encode.h>
 
 #include <cstdint>
 #include "matrix.h"
@@ -10,22 +11,9 @@ namespace erasure
 {
 	alignas(64) const extern uint8_t lohi_table[256][2][16];
 
-	namespace adv
-	{
-		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
-		void mul_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
-	}
-
-	namespace ssse3
-	{
-		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
-		void mul_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
-	}
-	namespace avx2
-	{
-		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
-		void mul_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes);
-	}
+	namespace adv = gfarith::adv;
+	namespace ssse3 = gfarith::ssse3;
+	namespace avx2 = gfarith::avx2;
 
 	/* Selects the fastest method based on
 	   alignment of the input and output
