@@ -36,7 +36,7 @@ void fill_exp()
 }
 void fill_log()
 {
-	for (size_t i = 0; i < 255; ++i)
+	for (uint8_t i = 0; i < 255; ++i)
 		log_table[exp_table[i]] = i;
 }
 
