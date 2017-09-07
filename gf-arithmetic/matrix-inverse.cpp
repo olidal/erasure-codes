@@ -141,47 +141,84 @@ namespace {
 
 namespace gfarith
 {
+	/*
 	matrix matrix::inverse() const
 	{
 		if (this->is_null())
 			return matrix();
 
 		assert(size1() == size2());
-		
+
 		matrix m = matrix(size1(), size2() * 2);
+
+		std::memset(m.data(), 0, m.datasize());
 
 		for (size_t r = 0; r < m.size1(); ++r)
 		{
-			std::copy(m[i]
+			std::copy((*this)[r].begin(), (*this)[r].end(), m[r].begin());
+			m(r, r + size2()) = 1;
 		}
 
 		for (size_t r1 = 0; r1 < m.size1(); ++r1)
 		{
 			symbol div = m(r1, r1);
 
-			assert(div.value != 0);
-
-			for (size_t c = 0; c < m.size2(); ++c)
+			if (div.value == 0)
 			{
-				m(r1, c) /=
+				matrix tmp(1, m.size2());
+
+				for (size_t r2 = r1 + 1; r2 < m.size1(); ++r2)
+				{
+					if (m(r2, r1).value != 0)
+					{
+						// Swap the rows using a matrix temporary
+						tmp[0] = m[r1];
+						m[r1] = m[r2];
+						m[r2] = tmp[0];
+
+						break;
+					}
+				}
+
+				div = m(r1, r1);
+
+				if (div.value == 0)
+					return matrix();
+			}
+			
+			for (size_t c = r1; c < m.size2(); ++c)
+			{
+				m(r1, c) /= div;
+			}
+
+			for (size_t r2 = r1 + 1; r2 < m.size1(); ++r2)
+			{
+				symbol mult = m(r2, r1);
+
+				for (size_t c = 0; c < m.size2(); ++c)
+				{
+					m(r2, c) -= mult * m(r1, c);
+				}
 			}
 		}
-	}
 
+		return m.submatrix(0, size1(), size1(), size1() * 2);
+	}
+	*/
 	matrix matrix::inverse() const
 	{
 		assert(size1() == size2());
 		assert(size1() <= INT_MAX);
-
+	
 		if (this->is_null())
 			return matrix();
-
+	
 		matrix m = *this;
 		gf* vals = (gf*)m.data();
-
+	
 		if (invert_mat(vals, (int)size1()) != 0)
 			return matrix();
-
+	
 		return m;
 	}
 }

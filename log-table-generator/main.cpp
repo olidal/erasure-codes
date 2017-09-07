@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 uint8_t mul(uint8_t a, uint8_t b)
 {
@@ -36,47 +37,55 @@ void fill_exp()
 void fill_log()
 {
 	for (size_t i = 0; i < 255; ++i)
-		log_table[exp_table[i] + 1] = i;
+		log_table[exp_table[i]] = i;
 }
 
-void print_table(uint8_t* table)
+void print_table(std::ostream& os, uint8_t* table)
 {
-	std::cout << "\t{\n";
+	os << "\t{\n";
 	for (size_t y = 0; y < 16; ++y)
 	{
-		std::cout << "\t\t";
+		os << "\t\t";
 
 		for (size_t x = 0; x < 16; ++x)
 		{
-			std::cout << (int)table[y * 16 + x] << ", ";
+			os << (int)table[y * 16 + x] << ", ";
 		}
 
-		std::cout << '\n';
+		os << '\n';
 	}
 
-	std::cout << "\t};";
+	os << "\t};";
 }
 
-int main()
+int main(int argc, char** argv)
 {
+	if (argc < 2)
+	{
+		std::cerr << "Usage: generate-log-tables <output-file>" << std::endl;
+		return -1;
+	}
+
+	std::ofstream file{ argv[1] };
+
 	std::memset(exp_table, 0, sizeof(exp_table));
 	std::memset(log_table, 0, sizeof(log_table));
 
 	fill_exp();
 	fill_log();
 
-	std::cout << "#include <cstdint>\n\n";
+	file << "#include <cstdint>\n\n";
 
-	std::cout << "namespace gfarith\n{\n"
+	file << "namespace gfarith\n{\n"
 		<< "\tuint8_t exp_table[] = ";
 
-	print_table(exp_table);
+	print_table(file, exp_table);
 
-	std::cout << "\n\n";
+	file << "\n\n";
 
-	std::cout << "\tuint8_t log_table[] = ";
+	file << "\tuint8_t log_table[] = ";
 
-	print_table(log_table);
+	print_table(file, log_table);
 
-	std::cout << "}\n" << std::endl;
+	file << "}\n" << std::endl;
 }
