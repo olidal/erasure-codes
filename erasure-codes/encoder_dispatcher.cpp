@@ -1,23 +1,7 @@
 #include "encoder_internal.h"
 
-#include <intrin.h>
-
 namespace erasure
 {
-	struct feature_bits
-	{
-		uint32_t sse3  : 1;
-		uint32_t sse4  : 1;
-		uint32_t sse41 : 1;
-		uint32_t sse42 : 1;
-		uint32_t sse4a : 1;
-	};
-
-#ifdef __GNUC__
-
-#endif
-
-
 	void matrix_mul(
 		const matrix& mat,
 		const uint8_t* const* inputs,

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 #if defined(__arm__) || defined(__TARGET_ARCH_ARM)
 #if defined(__ARM_ARCH_7__) \\
