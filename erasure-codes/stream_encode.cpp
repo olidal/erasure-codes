@@ -2,6 +2,7 @@
 #include "encoder_internal.h"
 
 #include <numeric>
+#include <new>
 
 #ifdef _MSC_VER
 #include <intrin.h>
