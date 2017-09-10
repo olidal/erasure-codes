@@ -10,7 +10,6 @@
 #error "AVX2 support required"
 #endif
 
-typedef __m256 __m256i;
 #endif
 
 namespace gfarith
