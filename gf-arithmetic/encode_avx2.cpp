@@ -5,6 +5,11 @@
 #include <intrin.h>
 #else
 #include <x86intrin.h>
+
+#ifndef __AVX2__
+#error "AVX2 support required"
+#endif
+
 #endif
 
 namespace gfarith

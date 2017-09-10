@@ -5,6 +5,10 @@
 #include <intrin.h>
 #else
 #include <x86intrin.h>
+
+#ifndef __SSSE3__
+#error "SSSE3 arch support required"
+#endif
 #endif
 
 namespace gfarith
