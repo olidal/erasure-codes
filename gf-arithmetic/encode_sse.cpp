@@ -21,7 +21,7 @@ namespace gfarith
 			uint8_t* out, 
 			size_t num_bytes)
 		{
-			assert(num_bytes % sizeof(__m128i) == 0);
+			assert(num_bytes % 16 == 0);
 
 			const __m128i mask = _mm_set1_epi8(0x0F);
 
@@ -59,7 +59,7 @@ namespace gfarith
 			__m128i lo = _mm_load_si128((const __m128i*)lohi_table[val][0]);
 			__m128i hi = _mm_load_si128((const __m128i*)lohi_table[val][1]);
 
-			for (size_t i = 0; i < num_bytes; i += sizeof(__m128i))
+			for (size_t i = 0; i < num_bytes; i += 16)
 			{
 				// in_val = in[i]
 				__m128i in_vals = _mm_load_si128((const __m128i*)(in + i));
@@ -82,7 +82,7 @@ namespace gfarith
 
 	namespace
 	{
-		constexpr size_t round_mask = ~(sizeof(__m128i) - 1);
+		constexpr size_t round_mask = ~(15);
 
 		bool is_aligned(const uint8_t* ptr)
 		{

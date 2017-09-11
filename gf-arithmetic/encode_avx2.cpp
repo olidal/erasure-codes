@@ -18,7 +18,7 @@ namespace gfarith
 	{
 		void mul_add_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes)
 		{
-			assert(num_bytes % sizeof(__m256i) == 0);
+			assert(num_bytes % 32 == 0);
 
 			const __m256i mask = _mm256_set1_epi8(0x0F);
 			// Load the entire lookup table into the lo register
@@ -52,7 +52,7 @@ namespace gfarith
 		}
 		void mul_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes)
 		{
-			assert(num_bytes % sizeof(__m256i) == 0);
+			assert(num_bytes % 32 == 0);
 
 			const __m256i mask = _mm256_set1_epi8(0x0F);
 			// Load the entire lookup table into the lo register
@@ -87,7 +87,7 @@ namespace gfarith
 
 	namespace 
 	{
-		const size_t round_mask = ~(sizeof(__m256i) - 1);
+		const size_t round_mask = ~(31);
 	}
 
 	void matrix_mul_avx2(
