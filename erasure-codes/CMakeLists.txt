@@ -2,7 +2,6 @@
 file(GLOB sources
 	*.h
 	*.cpp
-	encode/*.cpp
 )
 
 add_definitions(-DERASURE_BUILD)

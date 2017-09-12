@@ -15,67 +15,18 @@ namespace erasure
 	namespace ssse3 = gfarith::ssse3;
 	namespace avx2 = gfarith::avx2;
 
+	using gfarith::matrix_mul_basic;
+	using gfarith::matrix_mul_adv;
+	using gfarith::matrix_mul_sse;
+	using gfarith::matrix_mul_avx2;
+
+	using gfarith::matrix_mul_proc;
+
 	/* Selects the fastest method based on
 	   alignment of the input and output
 	   pointers.
 	*/
 	void matrix_mul(
-		const matrix& mat,
-		const uint8_t* const* inputs,
-		uint8_t* const* outputs,
-		size_t n_inputs,
-		size_t n_outputs,
-		size_t num_bytes);
-
-	/*
-	Preconditions:
-	   No alignment or size restrictions.
-	*/
-	void matrix_mul_basic(
-		const matrix& mat,
-		const uint8_t* const* inputs,
-		uint8_t* const* outputs,
-		size_t n_inputs,
-		size_t n_outputs,
-		size_t num_bytes);
-
-	/*
-	Preconditions:
-	   No alignment or size restrictions.
-	*/
-	void matrix_mul_adv(
-		const matrix& mat,
-		const uint8_t* const* inputs,
-		uint8_t* const* outputs,
-		size_t n_inputs,
-		size_t n_outputs,
-		size_t num_bytes);
-
-	/*
-	Preconditions:
-	   Inputs 16 byte aligned.
-	*/
-	void matrix_mul_sse(
-		const matrix& mat,
-		const uint8_t* const* inputs,
-		uint8_t* const* outputs,
-		size_t n_inputs,
-		size_t n_outputs,
-		size_t num_bytes);
-
-	/*
-	Preconditions:
-		None
-	*/
-	void matrix_mul_avx2(
-		const matrix& mat,
-		const uint8_t* const* inputs,
-		uint8_t* const* outputs,
-		size_t n_inputs,
-		size_t n_outputs,
-		size_t num_bytes);
-
-	typedef void(*matrix_mul_proc)(
 		const matrix& mat,
 		const uint8_t* const* inputs,
 		uint8_t* const* outputs,
