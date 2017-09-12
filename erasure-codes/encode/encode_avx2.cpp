@@ -6,7 +6,7 @@ namespace erasure
 {
 	namespace 
 	{
-		const size_t round_mask = ~(sizeof(__m256i) - 1);
+		const size_t round_mask = ~(31);
 	}
 
 	void matrix_mul_avx2(
@@ -31,9 +31,7 @@ namespace erasure
 					avx2::mul_add_row(mat(r, c).value, in, out, num_bytes & round_mask);
 			}
 		}
-
-		_mm256_zeroupper();
-
+		
 		if ((num_bytes & ~round_mask) != 0)
 		{
 			size_t completed = (num_bytes & round_mask);

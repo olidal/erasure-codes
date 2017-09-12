@@ -3,6 +3,10 @@
 #include "encoder_internal.h"
 #include "rs_encoder.h"
 
+#ifdef __EXCEPTIONS
+#	define EXCEPTIONS_ENABLED
+#endif
+
 bool validate(const uint8_t* const* ptrs, size_t n_ptrs)
 {
 	for (size_t i = 0; i < n_ptrs; ++i)
@@ -19,8 +23,10 @@ extern "C" erasure_encoder* erasure_create_encoder(
 	const erasure_encoder_parameters* params,
 	enum erasure_encoder_flags flags)
 {
+#ifdef EXCEPTIONS_ENABLED
 	try
 	{
+#endif
 		if (params->data_size == 0
 			|| params->n == 0
 			|| params->k == 0)
@@ -32,11 +38,13 @@ extern "C" erasure_encoder* erasure_create_encoder(
 		return erasure::create_encoder(
 				*params,
 				flags);
+#ifdef EXCEPTIONS_ENABLED
 	} 
 	catch (...)
 	{
 		return nullptr;
 	}
+#endif
 }
 extern "C" void erasure_destroy_encoder(erasure_encoder* encoder)
 {

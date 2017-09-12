@@ -49,6 +49,8 @@ namespace gfarith
 				result = _mm256_xor_si256(result, _mm256_loadu_si256((__m256i*)(out + i)));
 				_mm256_storeu_si256((__m256i*)(out + i), result);
 			}
+
+			_mm256_zeroupper();
 		}
 		void mul_row(uint8_t val, const uint8_t* in, uint8_t* out, size_t num_bytes)
 		{
@@ -82,6 +84,8 @@ namespace gfarith
 				// out[i] = result
 				_mm256_storeu_si256((__m256i*)(out + i), result);
 			}
+
+			_mm256_zeroupper();
 		}
 	}
 

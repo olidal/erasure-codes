@@ -1,27 +1,11 @@
 
+add_subdirectory(backends)
+
 file(GLOB sources
 	*.cpp
 	*.h
 )
 
-if (WIN32)
-	set (FLAG_TYPE "Windows")
-else()
-	set (FLAG_TYPE "Linux")
-endif()
-
-if (FLAG_TYPE STREQUAL "Linux")
-	add_definitions(" -march=native -mtune=native")
-#	set_source_files_properties(encode_sse.cpp PROPERTIES COMPILE_FLAGS " -mssse3")
-#	set_source_files_properties(encode_avx2.cpp PROPERTIES COMPILE_FLAGS " -mavx2")
-elseif(FLAG_TYPE STREQUAL "Windows")
-	if (NOT MSVC)
-		set_source_files_properties(encode_sse.cpp PROPERTIES COMPILE_FLAGS " /arch:ssse3")
-		set_source_files_properties(encode_avx2.cpp PROPERTIES COMPILE_FLAGS " /arch:avx2")
-	endif()
-else()
-	message(WARNING "Unknown compiler! Flags will not be passed for specific files.")
-endif()
 
 # Generate log_tables.cpp
 add_custom_command(
@@ -39,3 +23,12 @@ add_library(gfarithmetic ${sources} log_tables.cpp)
 
 # gfarithmetic needs log_tables
 add_dependencies(gfarithmetic log_tables)
+
+add_dependencies(gfarithmetic 
+	encode-basic
+	encode-adv
+	encode-ssse3
+	encode-avx2
+)
+
+target_compile_options(gfarithmetic PUBLIC "/EHsc")
