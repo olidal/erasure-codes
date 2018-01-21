@@ -33,3 +33,14 @@ then using that stream to encode or recover data using `erasure_stream_encode` o
 `erasure_stream_recover_data`. If the number of missing shards in the data stream does 
 not change then this will be faster than using the block API (much faster for smaller block 
 sizes). If the missing shards change then this will be just as fast as the block API.
+
+## Building
+
+Erasure-Codes is build via cmake. To build, use cmake to generate the build system of your choice,
+then use that to build the library. This can be done as follows
+```
+cmake /path/to/erasure/codes
+cmake --build .
+```
+
+Note that erasure-codes does not currently support installing into the target platform.
