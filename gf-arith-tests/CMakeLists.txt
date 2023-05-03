@@ -13,7 +13,7 @@ foreach(src_file ${sources})
 
 	set_target_properties(${test_name} PROPERTIES FOLDER gf-arithmetic-tests)
 
-	target_include_directories(${test_name} PRIVATE ../gf-arithmetic)
+	target_include_directories(${test_name} PRIVATE ../gf-arithmetic ../lohi-generator)
 	target_link_libraries(${test_name} PRIVATE gfarithmetic)
 
 	add_test(NAME ${test_name} COMMAND ${test_name})

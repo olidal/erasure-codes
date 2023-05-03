@@ -9,6 +9,7 @@ target_include_directories(encode-basic PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/.."
 add_library(encode-adv encode_adv.cpp)
 set_target_properties(encode-adv PROPERTIES FOLDER gf-arithmetic-backends)
 target_include_directories(encode-adv PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+target_link_libraries(encode-adv PRIVATE gfarithmetic)
 
 add_library(encode-ssse3 encode_sse.cpp)
 set_target_properties(encode-ssse3 PROPERTIES FOLDER gf-arithmetic-backends)

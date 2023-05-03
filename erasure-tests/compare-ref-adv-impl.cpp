@@ -1,5 +1,6 @@
 #include "liberasure.h"
 
+#include <cstring>
 #include <random>
 
 static constexpr size_t k = 16;

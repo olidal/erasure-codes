@@ -1,5 +1,6 @@
 #include "liberasure.h"
 
+#include <cstring>
 #include <random>
 
 alignas(64) uint8_t data[data_size * k];

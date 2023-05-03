@@ -31,7 +31,7 @@ add_dependencies(gfarithmetic
 	encode-avx2
 )
 
-target_compile_options(gfarithmetic PUBLIC "/EHsc")
+target_compile_options(gfarithmetic PUBLIC)
 
 target_link_libraries(gfarithmetic
 	PUBLIC encode-basic

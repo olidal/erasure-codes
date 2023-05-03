@@ -2,6 +2,7 @@
 
 using namespace erasure;
 
+#include <cstring>
 #include <random>
 #include <cstdlib>
 
@@ -12,9 +13,14 @@ static constexpr size_t data_size = 1024 * 1024;
 uint8_t* ptrs[n];
 bool present[n];
 
+/* This allocator only works with ICC compiler it seems
 uint8_t* data = (uint8_t*)_mm_malloc(data_size * k, 64);
 uint8_t* result = (uint8_t*)_mm_malloc(data_size * k, 64);
 uint8_t* parity = (uint8_t*)_mm_malloc(data_size * (n - k), 64);
+*/
+uint8_t *data = (uint8_t *)aligned_alloc(64, (data_size * k));
+uint8_t *result = (uint8_t *)aligned_alloc(64, (data_size * k));
+uint8_t *parity = (uint8_t *)aligned_alloc(64, (data_size * (n - k)));
 
 // Default value from mt19937 argument default value
 void generate_data(unsigned seed = 5489u)

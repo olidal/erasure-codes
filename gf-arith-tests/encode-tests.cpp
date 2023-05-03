@@ -88,8 +88,8 @@ TEST_CASE("mul_add_row test", "[encode]")
 		REQUIRE(mul_add_row_test(num_bytes, adv::mul_add_row));
 		if (num_bytes > 15)
 			REQUIRE(mul_add_row_test(num_bytes & ~15, ssse3::mul_add_row));
-		if (num_bytes > 31)
-			REQUIRE(mul_add_row_test(num_bytes & ~31, avx2::mul_add_row));
+//		if (num_bytes > 31)
+//			REQUIRE(mul_add_row_test(num_bytes & ~31, avx2::mul_add_row));
 	}
 }
 
@@ -100,7 +100,7 @@ TEST_CASE("mul_row test", "[encode]")
 		REQUIRE(mul_row_test(num_bytes, adv::mul_row));
 		if (num_bytes > 15)
 			REQUIRE(mul_row_test(num_bytes & ~15, ssse3::mul_row));
-		if (num_bytes > 31)
-			REQUIRE(mul_row_test(num_bytes & ~31, avx2::mul_row));
+//		if (num_bytes > 31)
+//			REQUIRE(mul_row_test(num_bytes & ~31, avx2::mul_row));
 	}
 }

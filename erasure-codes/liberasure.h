@@ -61,7 +61,8 @@ typedef struct {
 
 enum erasure_encoder_flags
 {
-	ERASURE_DEFAULT = 0,
+//	ERASURE_DEFAULT = 0,
+	ERASURE_DEFAULT = 3,
 	ERASURE_FORCE_REF_IMPL = 1,
 	ERASURE_FORCE_ADV_IMPL = 2,
 #if defined ERASURE_ARCH_I386 || defined ERASURE_ARCH_X86_64

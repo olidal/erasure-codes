@@ -9,12 +9,12 @@ foreach(src_file ${sources})
 
 	add_executable(${test_name} ${src_file})
 
-	add_dependencies(${test_name} erasure)
+	add_dependencies(${test_name} erasure gfarithmetic)
 
 	set_target_properties(${test_name} PROPERTIES FOLDER liberasure-tests)
 
-	target_include_directories(${test_name} PRIVATE ../erasure-codes)
-	target_link_libraries(${test_name} PRIVATE erasure)
+	target_include_directories(${test_name} PRIVATE ../erasure-codes ../gf-arithmetic)
+	target_link_libraries(${test_name} PRIVATE erasure gfarithmetic)
 
 	add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach(src_file)

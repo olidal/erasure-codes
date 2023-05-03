@@ -1,6 +1,6 @@
 #include "liberasure.h"
 
-
+#include <cstring>
 #include <random>
 
 uint8_t data[1024];
